@@ -20,7 +20,6 @@ export interface PostgresClientDialectConfig {
    */
   client: PostgresSingleClient | (() => Promise<PostgresSingleClient>);
 
-  /* BEGIN UNCHANGED CODE | Copyright (c) 2022 Sami Koskimäki | MIT License */
   /**
    * https://github.com/brianc/node-postgres/tree/master/packages/pg-cursor
    * ```ts
@@ -33,6 +32,7 @@ export interface PostgresClientDialectConfig {
    * })
    * ```
    */
+  /* BEGIN UNCHANGED CODE | Copyright (c) 2022 Sami Koskimäki | MIT License */
   cursor?: PostgresCursorConstructor;
   /* END UNCHANGED CODE */
 }
