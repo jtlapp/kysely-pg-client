@@ -1,9 +1,14 @@
+// Adapted from https://github.com/kysely-org/kysely/blob/master/src/dialect/postgres/postgres-dialect-config.ts
+// Unchanged code appears between BEGIN and END comments. If these sections
+// ever become different from the Kysely code, they should be updated here.
+
 import { PostgresCursorConstructor } from 'kysely';
 
 import { PostgresSingleClient } from './postgres-single-client';
 
 /**
- * Configuration for PostgresClientDialect.
+ * Configuration for PostgresClientDialect, which accepts an instance of
+ * `pg.Client` or a function that returns one.
  */
 export interface PostgresClientDialectConfig {
   /**
@@ -15,6 +20,7 @@ export interface PostgresClientDialectConfig {
    */
   client: PostgresSingleClient | (() => Promise<PostgresSingleClient>);
 
+  /* BEGIN UNCHANGED CODE | Copyright (c) 2022 Sami Koskimäki | MIT License */
   /**
    * https://github.com/brianc/node-postgres/tree/master/packages/pg-cursor
    * ```ts
@@ -28,4 +34,5 @@ export interface PostgresClientDialectConfig {
    * ```
    */
   cursor?: PostgresCursorConstructor;
+  /* END UNCHANGED CODE */
 }

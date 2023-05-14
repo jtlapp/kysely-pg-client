@@ -1,3 +1,7 @@
+// Adapted from https://github.com/kysely-org/kysely/blob/master/src/dialect/postgres/postgres-driver.ts
+// Unchanged code appears between BEGIN and END comments. If these sections
+// ever become different from the Kysely code, they should be updated here.
+
 import {
   CompiledQuery,
   DatabaseConnection,
@@ -12,7 +16,10 @@ import { PostgresSingleClient } from './postgres-single-client';
 import { isFunction, freeze } from './utils/object-utils';
 import { extendStackTrace } from './utils/stack-trace-utils';
 
-// TODO: look at extending PostgresDriver
+/**
+ * Kysely driver that uses a `pg.Client`, providing a single connection to
+ * the database instead of a pool of connections as with `PostgresDriver`.
+ */
 export class PostgresClientDriver implements Driver {
   readonly #config: PostgresClientDialectConfig;
   #client?: PostgresSingleClient;
@@ -43,6 +50,7 @@ export class PostgresClientDriver implements Driver {
     return this.#connection;
   }
 
+  /* BEGIN UNCHANGED CODE | Copyright (c) 2022 Sami Koskimäki | MIT License */
   async beginTransaction(
     connection: DatabaseConnection,
     settings: TransactionSettings
@@ -65,6 +73,7 @@ export class PostgresClientDriver implements Driver {
   async rollbackTransaction(connection: DatabaseConnection): Promise<void> {
     await connection.executeQuery(CompiledQuery.raw('rollback'));
   }
+  /* END UNCHANGED CODE */
 
   async releaseConnection(connection: PostgresClientConnection): Promise<void> {
     if (connection !== this.#connection) {
@@ -96,6 +105,7 @@ class PostgresClientConnection implements DatabaseConnection {
     this.#options = options;
   }
 
+  /* BEGIN UNCHANGED CODE | Copyright (c) 2022 Sami Koskimäki | MIT License */
   async executeQuery<O>(compiledQuery: CompiledQuery): Promise<QueryResult<O>> {
     try {
       const result = await this.#client.query<O>(compiledQuery.sql, [
@@ -161,4 +171,5 @@ class PostgresClientConnection implements DatabaseConnection {
       await cursor.close();
     }
   }
+  /* END UNCHANGED CODE */
 }

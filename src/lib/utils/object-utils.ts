@@ -1,3 +1,7 @@
+// Copied from https://github.com/kysely-org/kysely/blob/master/src/util/object-utils.ts
+
+// Copyright (c) 2022 Sami Koskimäki | MIT License
+
 export function isFunction(obj: unknown): obj is Function {
   return typeof obj === 'function';
 }
