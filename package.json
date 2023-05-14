@@ -33,9 +33,11 @@
   },
   "scripts": {
     "clean": "rm -rf node_modules & rm -rf dist & rm -rf test/node/dist",
+    "format": "prettier --write \"**/*.{js,ts,tsx,md}\"",
     "build": "rm -rdf dist && tsc && tsc -p tsconfig-cjs.json",
-    "test": "rm -rdf test/node/dist && npm run build && npm run test:build && npm run test:node",
-    "test:build": "tsc -p test/node",
+    "differ:build": "rm -rdf test/differ/dist && tsc -p test/differ",
+    "test": "npm run build && npm run test:build && npm run test:node",
+    "test:build": "rm -rdf test/node/dist && tsc -p test/node",
     "test:node": "DIALECT=postgres mocha --timeout 15000 test/node/dist/**/*.test.js"
   },
   "dependencies": {

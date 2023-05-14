@@ -1,6 +1,8 @@
 import { Kysely, sql } from 'kysely';
 import { Client } from 'pg';
 
+// TODO: test cursors
+
 import { PostgresClientDialect } from '../../../dist/cjs';
 import {
   DIALECTS,
