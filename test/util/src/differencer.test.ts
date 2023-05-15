@@ -13,8 +13,10 @@ const EXPECTED_OUTPUT_PATH = join(__dirname, '../expected-output.txt')
 
 describe('differencer', () => {
   it('should produce the expected stderr output', async () => {
+    const mockFilesDir = '../mock-kysely-files'
+    const command = `node ${DIFFERENCER_PATH} --mock-files-dir=${mockFilesDir}`
     const stderr = await new Promise((resolve) => {
-      exec(`node ${DIFFERENCER_PATH} mock-fetch`, (err: any) => {
+      exec(command, (err: any) => {
         resolve(
           err
             ? err.message.substring(err.message.indexOf('\n') + 1)

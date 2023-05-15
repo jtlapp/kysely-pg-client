@@ -7,9 +7,17 @@ export const TEST_CODE_PATH = '/test/node'
 const ADAPTED_FROM_REGEX = /Adapted from ([^\s]+)/i
 const BEGIN_UNCHANGED_LABEL = 'BEGIN UNCHANGED CODE'
 const END_UNCHANGED_LABEL = 'END UNCHANGED CODE'
-const MOCK_FILES_DIR = join(__dirname, '../mock-kysely-files')
 
+let mockFilesDir: string | null = null
 let differingCodeSegments = 0
+
+const MOCK_FILES_SWITCH = '--mock-files-dir='
+if (process.argv.length > 2 && process.argv[2].startsWith(MOCK_FILES_SWITCH)) {
+  mockFilesDir = join(
+    __dirname,
+    process.argv[2].substring(MOCK_FILES_SWITCH.length)
+  )
+}
 
 async function diffFiles(): Promise<void> {
   await diffSourceFiles()
@@ -82,7 +90,7 @@ async function loadFileFromURL(
   localFileName: string,
   url: string
 ): Promise<string> {
-  if (process.argv.length <= 2 || process.argv[2] !== 'mock-fetch') {
+  if (!mockFilesDir) {
     const response = await fetch(url)
     return await response.text()
   }
@@ -92,10 +100,10 @@ async function loadFileFromURL(
     'src/util/': 'src/lib/utils/',
     'test/node/src/': 'test/node/src/',
   }
-  const mockFileNames = await fsp.readdir(MOCK_FILES_DIR)
+  const mockFileNames = await fsp.readdir(mockFilesDir)
 
   for (const mockFileName of mockFileNames) {
-    const mockFilePath = join(MOCK_FILES_DIR, mockFileName)
+    const mockFilePath = join(mockFilesDir, mockFileName)
     if (mockFileName == localFileName) {
       return await fsp.readFile(mockFilePath, 'utf-8')
     }
