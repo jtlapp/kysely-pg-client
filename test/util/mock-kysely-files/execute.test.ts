@@ -10,7 +10,7 @@ import {
   insertPersons,
   TestContext,
   expect,
-} from '../../node/src/test-setup.js'
+} from '../../node/src/custom-test-setup.js'
 
 for (const dialect of DIALECTS) {
   describe(`${dialect}: execute`, () => {

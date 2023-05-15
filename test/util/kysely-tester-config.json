@@ -1,0 +1,14 @@
+{
+  "test-files": {
+    "delete": [],
+    "execute": [],
+    "insert": [],
+    "select": [
+      "should release connection on premature async iterator stop",
+      "should release connection on premature async iterator stop when using a specific chunk size",
+      "should throw an error if the cursor implementation is not provided for the postgres dialect"
+    ],
+    "transaction": ["should run multiple transactions in parallel"],
+    "update": []
+  }
+}

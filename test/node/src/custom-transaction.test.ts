@@ -1,6 +1,5 @@
 import { CompiledQuery, Transaction } from 'kysely'
 
-/* BEGIN UNCHANGED CODE | Copyright (c) 2022 Sami Koskimäki | MIT License */
 import {
   DIALECTS,
   clearDatabase,
@@ -10,10 +9,11 @@ import {
   expect,
   Database,
   insertDefaultDataSet,
-} from './test-setup.js'
+} from './custom-test-setup.js'
 
 for (const dialect of DIALECTS) {
-  describe(`${dialect}: transaction`, () => {
+  describe(`${dialect}: custom transaction`, () => {
+    /* BEGIN UNCHANGED CODE | Copyright (c) 2022 Sami Koskimäki | MIT License */
     let ctx: TestContext
     let executedQueries: CompiledQuery[] = []
 
@@ -37,113 +37,37 @@ for (const dialect of DIALECTS) {
     after(async () => {
       await destroyTest(ctx)
     })
-
-    if (dialect !== 'sqlite') {
-      it('should set the transaction isolation level', async () => {
-        await ctx.db
-          .transaction()
-          .setIsolationLevel('serializable')
-          .execute(async (trx) => {
-            await trx
-              .insertInto('person')
-              .values({
-                first_name: 'Foo',
-                last_name: 'Barson',
-                gender: 'male',
-              })
-              .execute()
-          })
-
-        if (dialect == 'postgres') {
-          expect(
-            executedQueries.map((it) => ({
-              sql: it.sql,
-              parameters: it.parameters,
-            }))
-          ).to.eql([
-            {
-              sql: 'start transaction isolation level serializable',
-              parameters: [],
-            },
-            {
-              sql: 'insert into "person" ("first_name", "last_name", "gender") values ($1, $2, $3)',
-              parameters: ['Foo', 'Barson', 'male'],
-            },
-            { sql: 'commit', parameters: [] },
-          ])
-        } else if (dialect === 'mysql') {
-          expect(
-            executedQueries.map((it) => ({
-              sql: it.sql,
-              parameters: it.parameters,
-            }))
-          ).to.eql([
-            {
-              sql: 'set transaction isolation level serializable',
-              parameters: [],
-            },
-            {
-              sql: 'begin',
-              parameters: [],
-            },
-            {
-              sql: 'insert into `person` (`first_name`, `last_name`, `gender`) values (?, ?, ?)',
-              parameters: ['Foo', 'Barson', 'male'],
-            },
-            { sql: 'commit', parameters: [] },
-          ])
-        }
-      })
-    }
-
-    if (dialect === 'postgres') {
-      it('should be able to start a transaction with a single connection', async () => {
-        const result = await ctx.db.connection().execute((db) => {
-          return db.transaction().execute((trx) => {
-            return trx
-              .insertInto('person')
-              .values({
-                first_name: 'Foo',
-                last_name: 'Barson',
-                gender: 'male',
-              })
-              .returning('first_name')
-              .executeTakeFirstOrThrow()
-          })
-        })
-
-        expect(result.first_name).to.equal('Foo')
-      })
-    }
     /* END UNCHANGED CODE */
 
     it('should commit a successful transaction', async () => {
+      const personID = 1000
       await ctx.db.transaction().execute(async (trx) => {
-        await insertPerson(trx, 1)
-        await insertPet(trx, 1)
+        await insertPerson(trx, personID)
+        await insertPet(trx, personID)
       })
 
-      expect(await doesPersonExists(1)).to.equal(true)
-      expect(await doesPetExists(1)).to.equal(true)
+      expect(await doesPersonExists(personID)).to.equal(true)
+      expect(await doesPetExists(personID)).to.equal(true)
     })
 
     it('should rollback an unsuccessful transaction', async () => {
+      const personID = 1001
       try {
         await ctx.db.transaction().execute(async (trx) => {
-          await insertPerson(trx, 1)
-          await insertPet(trx, 1)
+          await insertPerson(trx, personID)
+          await insertPet(trx, personID)
           throw new Error()
         })
       } catch (error) {}
 
-      expect(await doesPersonExists(1)).to.equal(false)
-      expect(await doesPetExists(1)).to.equal(false)
+      expect(await doesPersonExists(personID)).to.equal(false)
+      expect(await doesPetExists(personID)).to.equal(false)
     })
 
     it('should disallow parallel requests for connections', async () => {
       const results = await Promise.allSettled([
-        executeThread(1),
-        executeThread(2),
+        executeThread(1100),
+        executeThread(1101),
       ])
       expect(results.map((it) => it.status)).to.eql(['fulfilled', 'rejected'])
       expect((results[1] as PromiseRejectedResult).reason.message).to.contain(

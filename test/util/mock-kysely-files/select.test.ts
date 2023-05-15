@@ -15,7 +15,7 @@ import {
   PLUGINS,
   DIALECT_CONFIGS,
   Database,
-} from '../../node/src/test-setup'
+} from '../../node/src/custom-test-setup'
 
 /* BEGIN UNCHANGED CODE | Copyright (c) 2022 Sami Koskimäki | MIT License */
 for (const dialect of DIALECTS) {

@@ -99,6 +99,8 @@ if (process.env.TEST_TRANSFORMER) {
   // and all nodes and properties get cloned by default.
   PLUGINS.push(createNoopTransformerPlugin())
 }
+
+export const POOL_SIZE = 20
 /* END UNCHANGED CODE */
 
 export const DIALECT_CONFIGS = {

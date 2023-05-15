@@ -1,6 +1,9 @@
 import { promises as fsp } from 'fs'
 import { join } from 'path'
 
+// TODO: rename to show-diffs.ts
+import { BASE_KYSELY_RAW_URL } from './constants.js'
+
 export const SOURCE_CODE_PATH = '/src'
 export const TEST_CODE_PATH = '/test/node'
 
@@ -68,7 +71,7 @@ function createTestTargetURL(path: string): string {
 }
 
 function createTargetURL(path: string): string {
-  return `https://raw.githubusercontent.com/kysely-org/kysely/master/${path}`
+  return BASE_KYSELY_RAW_URL + path
 }
 
 async function* iterateOverTypeScriptFiles(
