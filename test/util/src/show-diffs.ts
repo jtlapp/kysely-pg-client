@@ -1,7 +1,6 @@
 import { promises as fsp } from 'fs'
 import { join } from 'path'
 
-// TODO: rename to show-diffs.ts
 import { BASE_KYSELY_RAW_URL } from './constants.js'
 
 export const SOURCE_CODE_PATH = '/src'

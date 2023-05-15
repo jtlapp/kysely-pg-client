@@ -8,10 +8,10 @@ import { exec } from 'child_process'
 import { promises as fsp } from 'fs'
 import { join } from 'path'
 
-const DIFFERENCER_PATH = join(__dirname, './differencer.js')
+const DIFFERENCER_PATH = join(__dirname, './show-diffs.js')
 const EXPECTED_OUTPUT_PATH = join(__dirname, '../expected-output.txt')
 
-describe('differencer', () => {
+describe('show-diffs', () => {
   it('should produce the expected stderr output', async () => {
     const mockFilesDir = '../mock-kysely-files'
     const command = `node ${DIFFERENCER_PATH} --mock-files-dir=${mockFilesDir}`
