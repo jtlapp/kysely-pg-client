@@ -1,6 +1,7 @@
 import { promises as fsp } from 'fs'
 
-const PARENT_OF_THIS_FILE = '/differ/'
+const SOURCE_CODE_PATH = '/src'
+const TEST_CODE_PATH = '/test/node'
 const ADAPTED_FROM_REGEX = /Adapted from ([^\s]+)/i
 const BEGIN_UNCHANGED_LABEL = 'BEGIN UNCHANGED CODE'
 const END_UNCHANGED_LABEL = 'END UNCHANGED CODE'
@@ -10,17 +11,16 @@ let differingCodeSegments = 0
 ;(async () => diffFiles())()
 
 async function diffFiles(): Promise<void> {
-  console.log()
   await diffSourceFiles()
   await diffTestFiles()
   if (differingCodeSegments > 0) {
-    console.log(`${differingCodeSegments} differing code segments found`)
+    console.log(`\n${differingCodeSegments} differing code segments found`)
     process.exit(1)
   }
 }
 
 async function diffSourceFiles(): Promise<void> {
-  for await (const path of iterateOverTypeScriptFiles('./src')) {
+  for await (const path of iterateOverTypeScriptFiles(`.${SOURCE_CODE_PATH}`)) {
     const sourceText = await fsp.readFile(path, 'utf-8')
     const match = sourceText.match(ADAPTED_FROM_REGEX)
     if (match) {
@@ -32,7 +32,7 @@ async function diffSourceFiles(): Promise<void> {
 }
 
 async function diffTestFiles(): Promise<void> {
-  for await (const path of iterateOverTypeScriptFiles('./test')) {
+  for await (const path of iterateOverTypeScriptFiles(`.${TEST_CODE_PATH}`)) {
     const testText = await fsp.readFile(path, 'utf-8')
     const url = createTestTargetURL(path)
     const kyselyText = await loadFileFromURL(url)
@@ -41,17 +41,17 @@ async function diffTestFiles(): Promise<void> {
 }
 
 function createSourceTargetURL(url: string): string {
-  const offset = url.lastIndexOf('/src/')
+  const offset = url.lastIndexOf(`${SOURCE_CODE_PATH}/`)
   if (offset < 0) {
-    throw Error("URL doesn't contain '/src/'")
+    throw Error(`URL doesn't contain ${SOURCE_CODE_PATH}`)
   }
   return createTargetURL(url.substring(offset + 1))
 }
 
 function createTestTargetURL(path: string): string {
-  const offset = path.lastIndexOf('/test/')
+  const offset = path.lastIndexOf(`${TEST_CODE_PATH}/`)
   if (offset < 0) {
-    throw Error("Path doesn't contain '/test/'")
+    throw Error(`Path doesn't contain ${TEST_CODE_PATH}`)
   }
   return createTargetURL(path.substring(offset + 1))
 }
@@ -69,7 +69,7 @@ async function* iterateOverTypeScriptFiles(
     const stat = await fsp.stat(path)
     if (stat.isDirectory()) {
       yield* iterateOverTypeScriptFiles(path)
-    } else if (file.endsWith('.ts') && !path.includes(PARENT_OF_THIS_FILE)) {
+    } else if (file.endsWith('.ts')) {
       yield path
     }
   }
@@ -81,37 +81,41 @@ async function loadFileFromURL(url: string): Promise<string> {
 }
 
 function diffText(path: string, sourceText: string, kyselyText: string): void {
-  const testOffset = path.indexOf('/test/')
+  const testOffset = path.indexOf(`${TEST_CODE_PATH}/`)
   if (testOffset < 0) {
-    path = path.substring(path.indexOf('/src/') + 1)
+    path = path.substring(path.indexOf(`${SOURCE_CODE_PATH}/`) + 1)
   } else {
     path = path.substring(testOffset + 1)
   }
   const sourceLines = sourceText.split('\n')
   const kyselyLines = kyselyText.split('\n')
 
-  let nextUnchangedLineNum = findNextUnchangedLine(0, sourceLines)
-  while (nextUnchangedLineNum >= 0) {
+  let nextUnchangedLineIndex = findNextUnchangedLine(0, sourceLines)
+  while (nextUnchangedLineIndex >= 0) {
     const endOfUnchangedLines = findEndOfUnchangedLines(
       sourceLines,
-      nextUnchangedLineNum
+      nextUnchangedLineIndex++
     )
-    ++nextUnchangedLineNum
     const unchangedLines = sourceLines.slice(
-      nextUnchangedLineNum,
+      nextUnchangedLineIndex,
       endOfUnchangedLines
     )
-    console.log(
-      `**** checking ${path} lines ${nextUnchangedLineNum} - ${endOfUnchangedLines}`
-    )
-    console.log('**** end unchanged lines', unchangedLines[endOfUnchangedLines])
-    findAndShowDifferingLines(
-      nextUnchangedLineNum,
+
+    const firstDifferingLineIndex = findFirstDifferingLine(
       unchangedLines,
-      kyselyLines,
-      path
+      kyselyLines
     )
-    nextUnchangedLineNum = findNextUnchangedLine(
+    if (firstDifferingLineIndex >= 0) {
+      console.log(`${path} differs from Kysely source at line:`)
+      console.log(
+        ` ${nextUnchangedLineIndex + firstDifferingLineIndex + 1}: ${
+          unchangedLines[firstDifferingLineIndex]
+        }`
+      )
+      ++differingCodeSegments
+    }
+
+    nextUnchangedLineIndex = findNextUnchangedLine(
       endOfUnchangedLines + 1,
       sourceLines
     )
@@ -133,56 +137,36 @@ function findNextUnchangedLine(
 function findEndOfUnchangedLines(lines: string[], index: number): number {
   for (let i = index; i < lines.length; ++i) {
     if (lines[i].includes(END_UNCHANGED_LABEL)) {
-      console.log(`**** found end label at`, i)
-      console.log(`  in line [${lines[i]}]`)
       return i
     }
   }
   throw Error(`Couldn't find matching ${END_UNCHANGED_LABEL} comment`)
 }
 
-function findAndShowDifferingLines(
-  startingUnchangedLineNum: number,
-  unchangedLines: string[],
-  kyselyLines: string[],
-  path: string
-): void {
-  const firstDifferingLineIndex = findFirstDifferingLine(
-    unchangedLines,
-    kyselyLines
-  )
-  console.log('**** firstDifferingLineIndex', firstDifferingLineIndex)
-  if (firstDifferingLineIndex >= 0) {
-    const differentLineIndex =
-      startingUnchangedLineNum + firstDifferingLineIndex
-    console.log(`[${path}]: code differs from Kysely source at line`)
-    console.log(
-      `${differentLineIndex + 1}: ${unchangedLines[differentLineIndex]}`
-    )
-    ++differingCodeSegments
-    process.exit(1)
-  }
-}
-
 function findFirstDifferingLine(
   unchangedLines: string[],
   kyselyLines: string[]
 ): number {
-  let kyselyLineNum = 0
-  while (kyselyLineNum < kyselyLines.length) {
-    if (kyselyLines[kyselyLineNum] == unchangedLines[0]) {
-      for (let i = 1; i < unchangedLines.length; ++i) {
-        console.log('**** comparing:')
-        console.log(unchangedLines[i])
-        console.log(kyselyLines[kyselyLineNum + i])
-        if (unchangedLines[i] !== kyselyLines[kyselyLineNum + i]) {
-          console.log("**** they're different")
-          return i
+  let lastDifferentLineIndex = 0
+  let kyselyLineIndex = 0
+  while (kyselyLineIndex < kyselyLines.length) {
+    if (kyselyLines[kyselyLineIndex] == unchangedLines[0]) {
+      let unchangedLineIndex = 1
+      while (unchangedLineIndex < unchangedLines.length) {
+        if (
+          unchangedLines[unchangedLineIndex] !==
+          kyselyLines[kyselyLineIndex + unchangedLineIndex]
+        ) {
+          lastDifferentLineIndex = unchangedLineIndex
+          break
         }
+        ++unchangedLineIndex
       }
-      return -1
+      if (unchangedLineIndex == unchangedLines.length) {
+        return -1
+      }
     }
-    ++kyselyLineNum
+    ++kyselyLineIndex
   }
-  return 0
+  return lastDifferentLineIndex
 }

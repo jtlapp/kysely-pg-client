@@ -2,9 +2,9 @@
 // Unchanged code appears between BEGIN and END comments. If these sections
 // ever become different from the Kysely code, they should be updated here.
 
-import { PostgresCursorConstructor } from 'kysely';
+import { PostgresCursorConstructor } from 'kysely'
 
-import { PostgresSingleClient } from './postgres-single-client';
+import { PostgresSingleClient } from './postgres-single-client'
 
 /**
  * Configuration for PostgresClientDialect, which accepts an instance of
@@ -18,7 +18,7 @@ export interface PostgresClientDialectConfig {
    *
    * https://node-postgres.com/apis/client
    */
-  client: PostgresSingleClient | (() => Promise<PostgresSingleClient>);
+  client: PostgresSingleClient | (() => Promise<PostgresSingleClient>)
 
   /**
    * https://github.com/brianc/node-postgres/tree/master/packages/pg-cursor
@@ -33,6 +33,6 @@ export interface PostgresClientDialectConfig {
    * ```
    */
   /* BEGIN UNCHANGED CODE | Copyright (c) 2022 Sami Koskimäki | MIT License */
-  cursor?: PostgresCursorConstructor;
+  cursor?: PostgresCursorConstructor
   /* END UNCHANGED CODE */
 }

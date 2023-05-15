@@ -12,37 +12,37 @@ import {
   PostgresIntrospector,
   PostgresQueryCompiler,
   QueryCompiler,
-} from 'kysely';
+} from 'kysely'
 
-import { PostgresClientDialectConfig } from './postgres-client-dialect-config';
-import { PostgresClientDriver } from './postgres-client-driver';
+import { PostgresClientDialectConfig } from './postgres-client-dialect-config'
+import { PostgresClientDriver } from './postgres-client-driver'
 
 /**
  * A Kysely Postgres dialect that uses a single `pg.Client` instance, providng
  * a single database connection instead of a pool of connections.
  */
 export class PostgresClientDialect implements Dialect {
-  readonly #config: PostgresClientDialectConfig;
+  readonly #config: PostgresClientDialectConfig
 
   constructor(config: PostgresClientDialectConfig) {
-    this.#config = config;
+    this.#config = config
   }
 
   createDriver(): Driver {
-    return new PostgresClientDriver(this.#config);
+    return new PostgresClientDriver(this.#config)
   }
 
   /* BEGIN UNCHANGED CODE | Copyright (c) 2022 Sami Koskimäki | MIT License */
   createQueryCompiler(): QueryCompiler {
-    return new PostgresQueryCompiler();
+    return new PostgresQueryCompiler()
   }
 
   createAdapter(): DialectAdapter {
-    return new PostgresAdapter();
+    return new PostgresAdapter()
   }
 
   createIntrospector(db: Kysely<any>): DatabaseIntrospector {
-    return new PostgresIntrospector(db);
+    return new PostgresIntrospector(db)
   }
   /* END UNCHANGED CODE */
 }

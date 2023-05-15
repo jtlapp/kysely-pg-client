@@ -1,5 +1,5 @@
-import { createSandbox, SinonSpy } from 'sinon';
-import { CompiledQuery, NoResultError, QueryExecutor, QueryNode } from 'kysely';
+import { createSandbox, SinonSpy } from 'sinon'
+import { CompiledQuery, NoResultError, QueryExecutor, QueryNode } from 'kysely'
 
 /* BEGIN UNCHANGED CODE | Copyright (c) 2022 Sami Koskimäki | MIT License */
 import {
@@ -10,15 +10,15 @@ import {
   insertPersons,
   TestContext,
   expect,
-} from './test-setup.js';
+} from './test-setup.js'
 
 for (const dialect of DIALECTS) {
   describe(`${dialect}: execute`, () => {
-    let ctx: TestContext;
+    let ctx: TestContext
 
     before(async function () {
-      ctx = await initTest(this, dialect);
-    });
+      ctx = await initTest(this, dialect)
+    })
 
     beforeEach(async () => {
       await insertPersons(ctx, [
@@ -46,16 +46,16 @@ for (const dialect of DIALECTS) {
           gender: 'male',
           pets: [{ name: 'Hammo 1', species: 'hamster' }],
         },
-      ]);
-    });
+      ])
+    })
 
     afterEach(async () => {
-      await clearDatabase(ctx);
-    });
+      await clearDatabase(ctx)
+    })
 
     after(async () => {
-      await destroyTest(ctx);
-    });
+      await destroyTest(ctx)
+    })
 
     describe('executeTakeFirstOrThrow', () => {
       it('should throw if no result is found', async () => {
@@ -64,21 +64,21 @@ for (const dialect of DIALECTS) {
             .selectFrom('person')
             .selectAll('person')
             .where('id', '=', 99999999)
-            .executeTakeFirstOrThrow();
+            .executeTakeFirstOrThrow()
 
-          throw new Error('should not get here');
+          throw new Error('should not get here')
         } catch (error) {
-          expect(error instanceof NoResultError).to.equal(true);
+          expect(error instanceof NoResultError).to.equal(true)
         }
-      });
+      })
 
       it('should throw a custom error constructor if no result is found and a custom error is provided', async () => {
         class MyNotFoundError extends Error {
-          node: QueryNode;
+          node: QueryNode
 
           constructor(node: QueryNode) {
-            super('custom error');
-            this.node = node;
+            super('custom error')
+            this.node = node
           }
         }
 
@@ -87,73 +87,73 @@ for (const dialect of DIALECTS) {
             .selectFrom('person')
             .selectAll('person')
             .where('id', '=', 99999999)
-            .executeTakeFirstOrThrow(MyNotFoundError);
+            .executeTakeFirstOrThrow(MyNotFoundError)
 
-          throw new Error('should not get here');
+          throw new Error('should not get here')
         } catch (error) {
-          expect(error instanceof MyNotFoundError).to.equal(true);
+          expect(error instanceof MyNotFoundError).to.equal(true)
 
           if (error instanceof MyNotFoundError) {
-            expect(error.node.kind).to.equal('SelectQueryNode');
+            expect(error.node.kind).to.equal('SelectQueryNode')
           }
         }
-      });
+      })
 
       it('should throw a custom error object if no result is found and a custom error is provided', async () => {
-        const message = 'my custom error';
-        const error = new Error(message);
+        const message = 'my custom error'
+        const error = new Error(message)
 
         try {
           await ctx.db
             .selectFrom('person')
             .selectAll('person')
             .where('id', '=', 99999999)
-            .executeTakeFirstOrThrow(() => error);
+            .executeTakeFirstOrThrow(() => error)
         } catch (error: any) {
-          expect(error.message).to.equal(message);
+          expect(error.message).to.equal(message)
         }
-      });
-    });
+      })
+    })
 
     describe('Kysely.executeQuery', () => {
-      const sandbox = createSandbox();
+      const sandbox = createSandbox()
       let executorSpy: SinonSpy<
         Parameters<QueryExecutor['executeQuery']>,
         ReturnType<QueryExecutor['executeQuery']>
-      >;
+      >
 
       beforeEach(() => {
         executorSpy = sandbox.spy(
           ctx.db.getExecutor() as QueryExecutor,
           'executeQuery'
-        );
-      });
+        )
+      })
 
       afterEach(() => {
-        sandbox.restore();
-      });
+        sandbox.restore()
+      })
 
       it('should execute a compiled query', async () => {
-        const compiledQuery = CompiledQuery.raw('select 1 as count');
+        const compiledQuery = CompiledQuery.raw('select 1 as count')
 
-        const results = await ctx.db.executeQuery(compiledQuery);
+        const results = await ctx.db.executeQuery(compiledQuery)
 
-        expect(executorSpy.calledOnce).to.be.true;
-        expect(executorSpy.firstCall.firstArg).to.equal(compiledQuery);
-        expect(results).to.equal(await executorSpy.firstCall.returnValue);
-      });
+        expect(executorSpy.calledOnce).to.be.true
+        expect(executorSpy.firstCall.firstArg).to.equal(compiledQuery)
+        expect(results).to.equal(await executorSpy.firstCall.returnValue)
+      })
 
       it('should compile and execute a query builder', async () => {
-        const query = ctx.db.selectFrom('person').selectAll();
-        const compiledQuery = query.compile();
+        const query = ctx.db.selectFrom('person').selectAll()
+        const compiledQuery = query.compile()
 
-        const results = await ctx.db.executeQuery(query);
+        const results = await ctx.db.executeQuery(query)
 
-        expect(executorSpy.calledOnce).to.be.true;
-        expect(executorSpy.firstCall.firstArg).to.deep.equal(compiledQuery);
-        expect(results).to.equal(await executorSpy.firstCall.returnValue);
-      });
-    });
-  });
+        expect(executorSpy.calledOnce).to.be.true
+        expect(executorSpy.firstCall.firstArg).to.deep.equal(compiledQuery)
+        expect(results).to.equal(await executorSpy.firstCall.returnValue)
+      })
+    })
+  })
 }
 /* END UNCHANGED CODE */

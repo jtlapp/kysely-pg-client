@@ -1,4 +1,4 @@
-import { CompiledQuery, Transaction } from 'kysely';
+import { CompiledQuery, Transaction } from 'kysely'
 
 /* BEGIN UNCHANGED CODE | Copyright (c) 2022 Sami Koskimäki | MIT License */
 import {
@@ -10,33 +10,33 @@ import {
   expect,
   Database,
   insertDefaultDataSet,
-} from './test-setup.js';
+} from './test-setup.js'
 
 for (const dialect of DIALECTS) {
   describe(`${dialect}: transaction`, () => {
-    let ctx: TestContext;
-    let executedQueries: CompiledQuery[] = [];
+    let ctx: TestContext
+    let executedQueries: CompiledQuery[] = []
 
     before(async function () {
       ctx = await initTest(this, dialect, (event) => {
         if (event.level === 'query') {
-          executedQueries.push(event.query);
+          executedQueries.push(event.query)
         }
-      });
-    });
+      })
+    })
 
     beforeEach(async () => {
-      await insertDefaultDataSet(ctx);
-      executedQueries = [];
-    });
+      await insertDefaultDataSet(ctx)
+      executedQueries = []
+    })
 
     afterEach(async () => {
-      await clearDatabase(ctx);
-    });
+      await clearDatabase(ctx)
+    })
 
     after(async () => {
-      await destroyTest(ctx);
-    });
+      await destroyTest(ctx)
+    })
 
     if (dialect !== 'sqlite') {
       it('should set the transaction isolation level', async () => {
@@ -51,8 +51,8 @@ for (const dialect of DIALECTS) {
                 last_name: 'Barson',
                 gender: 'male',
               })
-              .execute();
-          });
+              .execute()
+          })
 
         if (dialect == 'postgres') {
           expect(
@@ -70,7 +70,7 @@ for (const dialect of DIALECTS) {
               parameters: ['Foo', 'Barson', 'male'],
             },
             { sql: 'commit', parameters: [] },
-          ]);
+          ])
         } else if (dialect === 'mysql') {
           expect(
             executedQueries.map((it) => ({
@@ -91,9 +91,9 @@ for (const dialect of DIALECTS) {
               parameters: ['Foo', 'Barson', 'male'],
             },
             { sql: 'commit', parameters: [] },
-          ]);
+          ])
         }
-      });
+      })
     }
 
     if (dialect === 'postgres') {
@@ -108,47 +108,47 @@ for (const dialect of DIALECTS) {
                 gender: 'male',
               })
               .returning('first_name')
-              .executeTakeFirstOrThrow();
-          });
-        });
+              .executeTakeFirstOrThrow()
+          })
+        })
 
-        expect(result.first_name).to.equal('Foo');
-      });
+        expect(result.first_name).to.equal('Foo')
+      })
     }
     /* END UNCHANGED CODE */
 
     it('should commit a successful transaction', async () => {
       await ctx.db.transaction().execute(async (trx) => {
-        await insertPerson(trx, 1);
-        await insertPet(trx, 1);
-      });
+        await insertPerson(trx, 1)
+        await insertPet(trx, 1)
+      })
 
-      expect(await doesPersonExists(1)).to.equal(true);
-      expect(await doesPetExists(1)).to.equal(true);
-    });
+      expect(await doesPersonExists(1)).to.equal(true)
+      expect(await doesPetExists(1)).to.equal(true)
+    })
 
     it('should rollback an unsuccessful transaction', async () => {
       try {
         await ctx.db.transaction().execute(async (trx) => {
-          await insertPerson(trx, 1);
-          await insertPet(trx, 1);
-          throw new Error();
-        });
+          await insertPerson(trx, 1)
+          await insertPet(trx, 1)
+          throw new Error()
+        })
       } catch (error) {}
 
-      expect(await doesPersonExists(1)).to.equal(false);
-      expect(await doesPetExists(1)).to.equal(false);
-    });
+      expect(await doesPersonExists(1)).to.equal(false)
+      expect(await doesPetExists(1)).to.equal(false)
+    })
 
     it('should disallow parallel requests for connections', async () => {
       const results = await Promise.allSettled([
         executeThread(1),
         executeThread(2),
-      ]);
-      expect(results.map((it) => it.status)).to.eql(['fulfilled', 'rejected']);
+      ])
+      expect(results.map((it) => it.status)).to.eql(['fulfilled', 'rejected'])
       expect((results[1] as PromiseRejectedResult).reason.message).to.contain(
         'not configured as a pool'
-      );
+      )
 
       async function executeThread(id: number) {
         return ctx.db
@@ -159,9 +159,9 @@ for (const dialect of DIALECTS) {
             last_name: null,
             gender: 'other',
           })
-          .execute();
+          .execute()
       }
-    });
+    })
 
     /* BEGIN UNCHANGED CODE | Copyright (c) 2022 Sami Koskimäki | MIT License */
     async function insertPet(
@@ -175,7 +175,7 @@ for (const dialect of DIALECTS) {
           owner_id: ownerId,
           species: 'cat',
         })
-        .execute();
+        .execute()
     }
 
     async function insertPerson(
@@ -190,7 +190,7 @@ for (const dialect of DIALECTS) {
           last_name: null,
           gender: 'other',
         })
-        .execute();
+        .execute()
     }
 
     async function doesPersonExists(id: number): Promise<boolean> {
@@ -199,7 +199,7 @@ for (const dialect of DIALECTS) {
         .select('id')
         .where('id', '=', id)
         .where('first_name', '=', `Person ${id}`)
-        .executeTakeFirst());
+        .executeTakeFirst())
     }
 
     async function doesPetExists(ownerId: number): Promise<boolean> {
@@ -208,8 +208,8 @@ for (const dialect of DIALECTS) {
         .select('id')
         .where('owner_id', '=', ownerId)
         .where('name', '=', `Pet of ${ownerId}`)
-        .executeTakeFirst());
+        .executeTakeFirst())
     }
-  });
+  })
 }
 /* END UNCHANGED CODE */

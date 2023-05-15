@@ -1,4 +1,4 @@
-import { sql } from 'kysely';
+import { sql } from 'kysely'
 
 /* BEGIN UNCHANGED CODE | Copyright (c) 2022 Sami Koskimäki | MIT License */
 import {
@@ -8,27 +8,27 @@ import {
   TestContext,
   insertDefaultDataSet,
   DIALECTS,
-} from './test-setup.js';
+} from './test-setup.js'
 
 if (DIALECTS.includes('postgres')) {
   describe.skip(`query builder performance`, () => {
-    let ctx: TestContext;
+    let ctx: TestContext
 
     before(async function () {
-      ctx = await initTest(this, 'postgres');
-    });
+      ctx = await initTest(this, 'postgres')
+    })
 
     beforeEach(async () => {
-      await insertDefaultDataSet(ctx);
-    });
+      await insertDefaultDataSet(ctx)
+    })
 
     afterEach(async () => {
-      await clearDatabase(ctx);
-    });
+      await clearDatabase(ctx)
+    })
 
     after(async () => {
-      await destroyTest(ctx);
-    });
+      await destroyTest(ctx)
+    })
 
     it('simple query builder performance test', async () => {
       function test() {
@@ -53,28 +53,28 @@ if (DIALECTS.includes('postgres')) {
               'last_name'
             )})`.as('full_name'),
           ])
-          .compile();
+          .compile()
       }
 
-      const WARMUP_ROUNDS = 1000;
-      const TEST_ROUNDS = 100000;
+      const WARMUP_ROUNDS = 1000
+      const TEST_ROUNDS = 100000
 
       for (let i = 0; i < WARMUP_ROUNDS; ++i) {
-        test();
+        test()
       }
 
-      const t0 = new Date();
+      const t0 = new Date()
       for (let i = 0; i < TEST_ROUNDS; ++i) {
-        test();
+        test()
       }
-      const t1 = new Date();
+      const t1 = new Date()
 
       console.log(
         'query building time:',
         (t1.getTime() - t0.getTime()) / TEST_ROUNDS,
         'ms'
-      );
-    });
-  });
+      )
+    })
+  })
 }
 /* END UNCHANGED CODE */

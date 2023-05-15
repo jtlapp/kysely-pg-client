@@ -1,4 +1,4 @@
-import { DeleteResult, sql } from 'kysely';
+import { DeleteResult, sql } from 'kysely'
 
 /* BEGIN UNCHANGED CODE | Copyright (c) 2022 Sami Koskimäki | MIT License */
 import {
@@ -12,30 +12,30 @@ import {
   NOT_SUPPORTED,
   insertDefaultDataSet,
   DEFAULT_DATA_SET,
-} from './test-setup.js';
+} from './test-setup.js'
 
 for (const dialect of DIALECTS) {
   describe(`${dialect}: delete`, () => {
-    let ctx: TestContext;
+    let ctx: TestContext
 
     before(async function () {
-      ctx = await initTest(this, dialect);
-    });
+      ctx = await initTest(this, dialect)
+    })
 
     beforeEach(async () => {
-      await insertDefaultDataSet(ctx);
-    });
+      await insertDefaultDataSet(ctx)
+    })
 
     afterEach(async () => {
-      await clearDatabase(ctx);
-    });
+      await clearDatabase(ctx)
+    })
 
     after(async () => {
-      await destroyTest(ctx);
-    });
+      await destroyTest(ctx)
+    })
 
     it('should delete one row', async () => {
-      const query = ctx.db.deleteFrom('person').where('gender', '=', 'female');
+      const query = ctx.db.deleteFrom('person').where('gender', '=', 'female')
 
       testSql(query, dialect, {
         postgres: {
@@ -50,12 +50,12 @@ for (const dialect of DIALECTS) {
           sql: 'delete from "person" where "gender" = ?',
           parameters: ['female'],
         },
-      });
+      })
 
-      const result = await query.executeTakeFirst();
+      const result = await query.executeTakeFirst()
 
-      expect(result).to.be.instanceOf(DeleteResult);
-      expect(result.numDeletedRows).to.equal(1n);
+      expect(result).to.be.instanceOf(DeleteResult)
+      expect(result.numDeletedRows).to.equal(1n)
 
       expect(
         await ctx.db
@@ -67,38 +67,35 @@ for (const dialect of DIALECTS) {
       ).to.eql([
         { first_name: 'Arnold', last_name: 'Schwarzenegger', gender: 'male' },
         { first_name: 'Sylvester', last_name: 'Stallone', gender: 'male' },
-      ]);
-    });
+      ])
+    })
 
     it('should delete two rows', async () => {
       const query = ctx.db
         .deleteFrom('person')
         .where('first_name', '=', 'Jennifer')
-        .orWhere('first_name', '=', 'Arnold');
+        .orWhere('first_name', '=', 'Arnold')
 
-      const result = await query.executeTakeFirst();
+      const result = await query.executeTakeFirst()
 
-      expect(result).to.be.instanceOf(DeleteResult);
-      expect(result.numDeletedRows).to.equal(2n);
-    });
+      expect(result).to.be.instanceOf(DeleteResult)
+      expect(result.numDeletedRows).to.equal(2n)
+    })
 
     it('should delete zero rows', async () => {
       const query = ctx.db
         .deleteFrom('person')
-        .where('first_name', '=', 'Nobody');
+        .where('first_name', '=', 'Nobody')
 
-      const result = await query.executeTakeFirst();
+      const result = await query.executeTakeFirst()
 
-      expect(result).to.be.instanceOf(DeleteResult);
-      expect(result.numDeletedRows).to.equal(0n);
-    });
+      expect(result).to.be.instanceOf(DeleteResult)
+      expect(result.numDeletedRows).to.equal(0n)
+    })
 
     if (dialect === 'mysql') {
       it('should order and limit the deleted rows', async () => {
-        const query = ctx.db
-          .deleteFrom('person')
-          .orderBy('first_name')
-          .limit(2);
+        const query = ctx.db.deleteFrom('person').orderBy('first_name').limit(2)
 
         testSql(query, dialect, {
           mysql: {
@@ -107,13 +104,13 @@ for (const dialect of DIALECTS) {
           },
           postgres: NOT_SUPPORTED,
           sqlite: NOT_SUPPORTED,
-        });
+        })
 
-        const result = await query.executeTakeFirst();
+        const result = await query.executeTakeFirst()
 
-        expect(result).to.be.instanceOf(DeleteResult);
-        expect(result.numDeletedRows).to.equal(2n);
-      });
+        expect(result).to.be.instanceOf(DeleteResult)
+        expect(result.numDeletedRows).to.equal(2n)
+      })
     }
 
     if (dialect === 'postgres' || dialect === 'sqlite') {
@@ -121,7 +118,7 @@ for (const dialect of DIALECTS) {
         const query = ctx.db
           .deleteFrom('person')
           .where('gender', '=', 'male')
-          .returning(['first_name', 'last_name as last']);
+          .returning(['first_name', 'last_name as last'])
 
         testSql(query, dialect, {
           postgres: {
@@ -133,26 +130,26 @@ for (const dialect of DIALECTS) {
             sql: 'delete from "person" where "gender" = ? returning "first_name", "last_name" as "last"',
             parameters: ['male'],
           },
-        });
+        })
 
-        const result = await query.execute();
+        const result = await query.execute()
 
-        expect(result).to.have.length(2);
-        expect(Object.keys(result[0]).sort()).to.eql(['first_name', 'last']);
+        expect(result).to.have.length(2)
+        expect(Object.keys(result[0]).sort()).to.eql(['first_name', 'last'])
         expect(result).to.containSubset([
           { first_name: 'Arnold', last: 'Schwarzenegger' },
           { first_name: 'Sylvester', last: 'Stallone' },
-        ]);
-      });
+        ])
+      })
 
       it('conditional returning statement should add optional fields', async () => {
-        const condition = true;
+        const condition = true
 
         const query = ctx.db
           .deleteFrom('person')
           .where('gender', '=', 'female')
           .returning('first_name')
-          .$if(condition, (qb) => qb.returning('last_name'));
+          .$if(condition, (qb) => qb.returning('last_name'))
 
         testSql(query, dialect, {
           postgres: {
@@ -164,11 +161,11 @@ for (const dialect of DIALECTS) {
             sql: 'delete from "person" where "gender" = ? returning "first_name", "last_name"',
             parameters: ['female'],
           },
-        });
+        })
 
-        const result = await query.executeTakeFirstOrThrow();
-        expect(result.last_name).to.equal('Aniston');
-      });
+        const result = await query.executeTakeFirstOrThrow()
+        expect(result.last_name).to.equal('Aniston')
+      })
     }
 
     if (dialect === 'postgres') {
@@ -177,7 +174,7 @@ for (const dialect of DIALECTS) {
           .deleteFrom('person')
           .using('pet')
           .whereRef('pet.owner_id', '=', 'person.id')
-          .where('pet.species', '=', sql`${'NO_SUCH_SPECIES'}`);
+          .where('pet.species', '=', sql`${'NO_SUCH_SPECIES'}`)
 
         testSql(query, dialect, {
           postgres: {
@@ -191,10 +188,10 @@ for (const dialect of DIALECTS) {
           },
           mysql: NOT_SUPPORTED,
           sqlite: NOT_SUPPORTED,
-        });
+        })
 
-        await query.execute();
-      });
+        await query.execute()
+      })
 
       it('should delete from t1 using t2, t3', async () => {
         const query = ctx.db
@@ -202,7 +199,7 @@ for (const dialect of DIALECTS) {
           .using(['pet', 'toy'])
           .whereRef('pet.owner_id', '=', 'person.id')
           .whereRef('toy.pet_id', '=', 'pet.id')
-          .where('toy.price', '=', 0);
+          .where('toy.price', '=', 0)
 
         testSql(query, dialect, {
           postgres: {
@@ -217,10 +214,10 @@ for (const dialect of DIALECTS) {
           },
           mysql: NOT_SUPPORTED,
           sqlite: NOT_SUPPORTED,
-        });
+        })
 
-        await query.execute();
-      });
+        await query.execute()
+      })
 
       it('should delete from t1 using t2, t3 returning t2.column', async () => {
         const query = ctx.db
@@ -229,7 +226,7 @@ for (const dialect of DIALECTS) {
           .whereRef('toy.pet_id', '=', 'pet.id')
           .whereRef('pet.owner_id', '=', 'person.id')
           .where('person.first_name', '=', 'Bob')
-          .returning('pet.name');
+          .returning('pet.name')
 
         testSql(query, dialect, {
           postgres: {
@@ -245,16 +242,16 @@ for (const dialect of DIALECTS) {
           },
           mysql: NOT_SUPPORTED,
           sqlite: NOT_SUPPORTED,
-        });
+        })
 
-        await query.execute();
-      });
+        await query.execute()
+      })
 
       it('should delete from t1 returning *', async () => {
         const query = ctx.db
           .deleteFrom('pet')
           .where('pet.species', '=', 'cat')
-          .returningAll();
+          .returningAll()
 
         testSql(query, dialect, {
           postgres: {
@@ -267,10 +264,10 @@ for (const dialect of DIALECTS) {
           },
           mysql: NOT_SUPPORTED,
           sqlite: NOT_SUPPORTED,
-        });
+        })
 
-        await query.execute();
-      });
+        await query.execute()
+      })
 
       it('should delete from t1 using t2, t3 returning *', async () => {
         const query = ctx.db
@@ -279,7 +276,7 @@ for (const dialect of DIALECTS) {
           .whereRef('toy.pet_id', '=', 'pet.id')
           .whereRef('pet.owner_id', '=', 'person.id')
           .where('person.first_name', '=', 'Zoro')
-          .returningAll();
+          .returningAll()
 
         testSql(query, dialect, {
           postgres: {
@@ -295,10 +292,10 @@ for (const dialect of DIALECTS) {
           },
           mysql: NOT_SUPPORTED,
           sqlite: NOT_SUPPORTED,
-        });
+        })
 
-        await query.execute();
-      });
+        await query.execute()
+      })
 
       it('should delete from t1 using t2, t3 returning t1.*, t2.*', async () => {
         const query = ctx.db
@@ -307,7 +304,7 @@ for (const dialect of DIALECTS) {
           .whereRef('toy.pet_id', '=', 'pet.id')
           .whereRef('pet.owner_id', '=', 'person.id')
           .where('person.first_name', '=', 'Luffy')
-          .returningAll(['toy', 'pet']);
+          .returningAll(['toy', 'pet'])
 
         testSql(query, dialect, {
           postgres: {
@@ -323,10 +320,10 @@ for (const dialect of DIALECTS) {
           },
           mysql: NOT_SUPPORTED,
           sqlite: NOT_SUPPORTED,
-        });
+        })
 
-        await query.execute();
-      });
+        await query.execute()
+      })
 
       it('should delete from t1 using t2, t3 returning t2.*', async () => {
         const query = ctx.db
@@ -335,7 +332,7 @@ for (const dialect of DIALECTS) {
           .whereRef('toy.pet_id', '=', 'pet.id')
           .whereRef('pet.owner_id', '=', 'person.id')
           .where('person.first_name', '=', 'Itachi')
-          .returningAll('pet');
+          .returningAll('pet')
 
         testSql(query, dialect, {
           postgres: {
@@ -351,16 +348,16 @@ for (const dialect of DIALECTS) {
           },
           mysql: NOT_SUPPORTED,
           sqlite: NOT_SUPPORTED,
-        });
+        })
 
-        await query.execute();
-      });
+        await query.execute()
+      })
 
       it('should delete from t1 returning t1.*', async () => {
         const query = ctx.db
           .deleteFrom('person')
           .where('gender', '=', 'male')
-          .returningAll('person');
+          .returningAll('person')
 
         testSql(query, dialect, {
           postgres: {
@@ -373,16 +370,16 @@ for (const dialect of DIALECTS) {
           },
           mysql: NOT_SUPPORTED,
           sqlite: NOT_SUPPORTED,
-        });
+        })
 
-        await query.execute();
-      });
+        await query.execute()
+      })
 
       it('should delete from t1 returning *', async () => {
         const query = ctx.db
           .deleteFrom('person')
           .where('gender', '=', 'male')
-          .returningAll();
+          .returningAll()
 
         testSql(query, dialect, {
           postgres: {
@@ -391,10 +388,10 @@ for (const dialect of DIALECTS) {
           },
           mysql: NOT_SUPPORTED,
           sqlite: NOT_SUPPORTED,
-        });
+        })
 
-        await query.execute();
-      });
+        await query.execute()
+      })
 
       it('should delete from t1 using t2, t3 returning *', async () => {
         const query = ctx.db
@@ -403,7 +400,7 @@ for (const dialect of DIALECTS) {
           .whereRef('toy.pet_id', '=', 'pet.id')
           .whereRef('pet.owner_id', '=', 'person.id')
           .where('person.first_name', '=', 'Bob')
-          .returningAll();
+          .returningAll()
 
         testSql(query, dialect, {
           postgres: {
@@ -419,10 +416,10 @@ for (const dialect of DIALECTS) {
           },
           mysql: NOT_SUPPORTED,
           sqlite: NOT_SUPPORTED,
-        });
+        })
 
-        await query.execute();
-      });
+        await query.execute()
+      })
     }
 
     if (dialect === 'mysql') {
@@ -431,7 +428,7 @@ for (const dialect of DIALECTS) {
           .deleteFrom('person')
           .using('person')
           .innerJoin('pet', 'pet.owner_id', 'person.id')
-          .where('pet.species', '=', sql`${'NO_SUCH_SPECIES'}`);
+          .where('pet.species', '=', sql`${'NO_SUCH_SPECIES'}`)
 
         testSql(query, dialect, {
           postgres: NOT_SUPPORTED,
@@ -445,17 +442,17 @@ for (const dialect of DIALECTS) {
             parameters: ['NO_SUCH_SPECIES'],
           },
           sqlite: NOT_SUPPORTED,
-        });
+        })
 
-        await query.execute();
-      });
+        await query.execute()
+      })
 
       it('should delete from t1 using t1 left join t2', async () => {
         const query = ctx.db
           .deleteFrom('person')
           .using('person')
           .leftJoin('pet', 'pet.owner_id', 'person.id')
-          .where('pet.species', '=', sql`${'NO_SUCH_SPECIES'}`);
+          .where('pet.species', '=', sql`${'NO_SUCH_SPECIES'}`)
 
         testSql(query, dialect, {
           postgres: NOT_SUPPORTED,
@@ -469,10 +466,10 @@ for (const dialect of DIALECTS) {
             parameters: ['NO_SUCH_SPECIES'],
           },
           sqlite: NOT_SUPPORTED,
-        });
+        })
 
-        await query.execute();
-      });
+        await query.execute()
+      })
 
       it('should delete from t1 using t1 inner join t2 left join t3', async () => {
         const query = ctx.db
@@ -481,7 +478,7 @@ for (const dialect of DIALECTS) {
           .innerJoin('pet', 'pet.owner_id', 'person.id')
           .leftJoin('toy', 'toy.pet_id', 'pet.id')
           .where('pet.species', '=', sql`${'NO_SUCH_SPECIES'}`)
-          .orWhere('toy.price', '=', 0);
+          .orWhere('toy.price', '=', 0)
 
         testSql(query, dialect, {
           postgres: NOT_SUPPORTED,
@@ -497,16 +494,16 @@ for (const dialect of DIALECTS) {
             parameters: ['NO_SUCH_SPECIES', 0],
           },
           sqlite: NOT_SUPPORTED,
-        });
+        })
 
-        await query.execute();
-      });
+        await query.execute()
+      })
 
       it('should delete from t1 using t1, t2', async () => {
         const query = ctx.db
           .deleteFrom('person')
           .using(['person', 'pet'])
-          .where('pet.species', '=', sql`${'NO_SUCH_SPECIES'}`);
+          .where('pet.species', '=', sql`${'NO_SUCH_SPECIES'}`)
 
         testSql(query, dialect, {
           postgres: NOT_SUPPORTED,
@@ -519,17 +516,17 @@ for (const dialect of DIALECTS) {
             parameters: ['NO_SUCH_SPECIES'],
           },
           sqlite: NOT_SUPPORTED,
-        });
+        })
 
-        await query.execute();
-      });
+        await query.execute()
+      })
 
       it('should delete from t1 using t1, t2 inner join t3', async () => {
         const query = ctx.db
           .deleteFrom('person')
           .using(['person', 'pet'])
           .innerJoin('toy', 'toy.pet_id', 'pet.id')
-          .where('toy.price', '=', 0);
+          .where('toy.price', '=', 0)
 
         testSql(query, dialect, {
           postgres: NOT_SUPPORTED,
@@ -543,17 +540,17 @@ for (const dialect of DIALECTS) {
             parameters: [0],
           },
           sqlite: NOT_SUPPORTED,
-        });
+        })
 
-        await query.execute();
-      });
+        await query.execute()
+      })
 
       it('should delete from t1 using t1, t2 left join t3', async () => {
         const query = ctx.db
           .deleteFrom('person')
           .using(['person', 'pet'])
           .leftJoin('toy', 'toy.pet_id', 'pet.id')
-          .where('toy.price', '=', 0);
+          .where('toy.price', '=', 0)
 
         testSql(query, dialect, {
           postgres: NOT_SUPPORTED,
@@ -567,17 +564,17 @@ for (const dialect of DIALECTS) {
             parameters: [0],
           },
           sqlite: NOT_SUPPORTED,
-        });
+        })
 
-        await query.execute();
-      });
+        await query.execute()
+      })
 
       it('should delete from t1, t2 using t1 inner join t2', async () => {
         const query = ctx.db
           .deleteFrom(['person', 'pet'])
           .using('person')
           .innerJoin('pet', 'pet.owner_id', 'person.id')
-          .where('person.id', '=', 911);
+          .where('person.id', '=', 911)
 
         testSql(query, dialect, {
           postgres: NOT_SUPPORTED,
@@ -591,17 +588,17 @@ for (const dialect of DIALECTS) {
             parameters: [911],
           },
           sqlite: NOT_SUPPORTED,
-        });
+        })
 
-        await query.execute();
-      });
+        await query.execute()
+      })
 
       it('should delete from t1, t2 using t1 left join t2', async () => {
         const query = ctx.db
           .deleteFrom(['person', 'pet'])
           .using('person')
           .leftJoin('pet', 'pet.owner_id', 'person.id')
-          .where('person.id', '=', 911);
+          .where('person.id', '=', 911)
 
         testSql(query, dialect, {
           postgres: NOT_SUPPORTED,
@@ -615,10 +612,10 @@ for (const dialect of DIALECTS) {
             parameters: [911],
           },
           sqlite: NOT_SUPPORTED,
-        });
+        })
 
-        await query.execute();
-      });
+        await query.execute()
+      })
 
       it('should delete from t1, t2 using t1 inner join t2 inner join t3', async () => {
         const query = ctx.db
@@ -626,7 +623,7 @@ for (const dialect of DIALECTS) {
           .using('person')
           .innerJoin('pet', 'pet.owner_id', 'person.id')
           .innerJoin('toy', 'toy.pet_id', 'pet.id')
-          .where('toy.price', '=', 1000);
+          .where('toy.price', '=', 1000)
 
         testSql(query, dialect, {
           postgres: NOT_SUPPORTED,
@@ -641,10 +638,10 @@ for (const dialect of DIALECTS) {
             parameters: [1000],
           },
           sqlite: NOT_SUPPORTED,
-        });
+        })
 
-        await query.execute();
-      });
+        await query.execute()
+      })
 
       it('should delete from t1, t2 using t1 inner join t2 left join t3', async () => {
         const query = ctx.db
@@ -652,7 +649,7 @@ for (const dialect of DIALECTS) {
           .using('person')
           .innerJoin('pet', 'pet.owner_id', 'person.id')
           .leftJoin('toy', 'toy.pet_id', 'pet.id')
-          .where('toy.price', '=', 1000);
+          .where('toy.price', '=', 1000)
 
         testSql(query, dialect, {
           postgres: NOT_SUPPORTED,
@@ -667,10 +664,10 @@ for (const dialect of DIALECTS) {
             parameters: [1000],
           },
           sqlite: NOT_SUPPORTED,
-        });
+        })
 
-        await query.execute();
-      });
+        await query.execute()
+      })
 
       it('should delete from t1, t2 using t1 left join t2 left join t3', async () => {
         const query = ctx.db
@@ -678,7 +675,7 @@ for (const dialect of DIALECTS) {
           .using('person')
           .leftJoin('pet', 'pet.owner_id', 'person.id')
           .leftJoin('toy', 'toy.pet_id', 'pet.id')
-          .where('toy.price', '=', 1000);
+          .where('toy.price', '=', 1000)
 
         testSql(query, dialect, {
           postgres: NOT_SUPPORTED,
@@ -693,10 +690,10 @@ for (const dialect of DIALECTS) {
             parameters: [1000],
           },
           sqlite: NOT_SUPPORTED,
-        });
+        })
 
-        await query.execute();
-      });
+        await query.execute()
+      })
 
       it('should delete from t1, t2, t3 using t1 inner join t2 inner join t3', async () => {
         const query = ctx.db
@@ -704,7 +701,7 @@ for (const dialect of DIALECTS) {
           .using('person')
           .innerJoin('pet', 'pet.owner_id', 'person.id')
           .innerJoin('toy', 'toy.pet_id', 'pet.id')
-          .where('toy.price', '=', 1000);
+          .where('toy.price', '=', 1000)
 
         testSql(query, dialect, {
           postgres: NOT_SUPPORTED,
@@ -719,10 +716,10 @@ for (const dialect of DIALECTS) {
             parameters: [1000],
           },
           sqlite: NOT_SUPPORTED,
-        });
+        })
 
-        await query.execute();
-      });
+        await query.execute()
+      })
 
       it('should delete from t1, t2, t3 using t1 inner join t2 left join t3', async () => {
         const query = ctx.db
@@ -730,7 +727,7 @@ for (const dialect of DIALECTS) {
           .using('person')
           .innerJoin('pet', 'pet.owner_id', 'person.id')
           .leftJoin('toy', 'toy.pet_id', 'pet.id')
-          .where('toy.price', '=', 1000);
+          .where('toy.price', '=', 1000)
 
         testSql(query, dialect, {
           postgres: NOT_SUPPORTED,
@@ -745,10 +742,10 @@ for (const dialect of DIALECTS) {
             parameters: [1000],
           },
           sqlite: NOT_SUPPORTED,
-        });
+        })
 
-        await query.execute();
-      });
+        await query.execute()
+      })
 
       it('should delete from t1, t2, t3 using t1 left join t2 left join t3', async () => {
         const query = ctx.db
@@ -756,7 +753,7 @@ for (const dialect of DIALECTS) {
           .using('person')
           .leftJoin('pet', 'pet.owner_id', 'person.id')
           .leftJoin('toy', 'toy.pet_id', 'pet.id')
-          .where('toy.price', '=', 1000);
+          .where('toy.price', '=', 1000)
 
         testSql(query, dialect, {
           postgres: NOT_SUPPORTED,
@@ -771,10 +768,10 @@ for (const dialect of DIALECTS) {
             parameters: [1000],
           },
           sqlite: NOT_SUPPORTED,
-        });
+        })
 
-        await query.execute();
-      });
+        await query.execute()
+      })
     }
 
     if (dialect === 'postgres') {
@@ -782,24 +779,24 @@ for (const dialect of DIALECTS) {
         const stream = ctx.db
           .deleteFrom('person')
           .returning(['first_name', 'last_name', 'gender'])
-          .stream();
+          .stream()
 
-        const people = [];
+        const people = []
 
         for await (const person of stream) {
-          people.push(person);
+          people.push(person)
         }
 
-        expect(people).to.have.length(DEFAULT_DATA_SET.length);
+        expect(people).to.have.length(DEFAULT_DATA_SET.length)
         expect(people).to.eql(
           DEFAULT_DATA_SET.map(({ first_name, last_name, gender }) => ({
             first_name,
             last_name,
             gender,
           }))
-        );
-      });
+        )
+      })
     }
-  });
+  })
 }
 /* END UNCHANGED CODE */

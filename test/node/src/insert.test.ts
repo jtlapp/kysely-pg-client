@@ -1,4 +1,4 @@
-import { AliasedRawBuilder, InsertResult, Kysely, sql } from 'kysely';
+import { AliasedRawBuilder, InsertResult, Kysely, sql } from 'kysely'
 
 /* BEGIN UNCHANGED CODE | Copyright (c) 2022 Sami Koskimäki | MIT License */
 import {
@@ -13,34 +13,34 @@ import {
   Database,
   NOT_SUPPORTED,
   insertDefaultDataSet,
-} from './test-setup.js';
+} from './test-setup.js'
 
 for (const dialect of DIALECTS) {
   describe(`${dialect}: insert`, () => {
-    let ctx: TestContext;
+    let ctx: TestContext
 
     before(async function () {
-      ctx = await initTest(this, dialect);
-    });
+      ctx = await initTest(this, dialect)
+    })
 
     beforeEach(async () => {
-      await insertDefaultDataSet(ctx);
-    });
+      await insertDefaultDataSet(ctx)
+    })
 
     afterEach(async () => {
-      await clearDatabase(ctx);
-    });
+      await clearDatabase(ctx)
+    })
 
     after(async () => {
-      await destroyTest(ctx);
-    });
+      await destroyTest(ctx)
+    })
 
     it('should insert one row', async () => {
       const query = ctx.db.insertInto('person').values({
         first_name: 'Foo',
         last_name: 'Barson',
         gender: 'other',
-      });
+      })
 
       testSql(query, dialect, {
         postgres: {
@@ -55,23 +55,23 @@ for (const dialect of DIALECTS) {
           sql: 'insert into "person" ("first_name", "last_name", "gender") values (?, ?, ?)',
           parameters: ['Foo', 'Barson', 'other'],
         },
-      });
+      })
 
-      const result = await query.executeTakeFirst();
-      expect(result).to.be.instanceOf(InsertResult);
-      expect(result.numInsertedOrUpdatedRows).to.equal(1n);
+      const result = await query.executeTakeFirst()
+      expect(result).to.be.instanceOf(InsertResult)
+      expect(result.numInsertedOrUpdatedRows).to.equal(1n)
 
       if (dialect === 'postgres') {
-        expect(result.insertId).to.be.undefined;
+        expect(result.insertId).to.be.undefined
       } else {
-        expect(result.insertId).to.be.a('bigint');
+        expect(result.insertId).to.be.a('bigint')
       }
 
       expect(await getNewestPerson(ctx.db)).to.eql({
         first_name: 'Foo',
         last_name: 'Barson',
-      });
-    });
+      })
+    })
 
     it('should insert one row with complex values', async () => {
       const query = ctx.db.insertInto('person').values({
@@ -83,7 +83,7 @@ for (const dialect of DIALECTS) {
             ? sql`'Bar' || 'son'`
             : sql`concat('Bar', 'son')`,
         gender: 'other',
-      });
+      })
 
       testSql(query, dialect, {
         postgres: {
@@ -98,17 +98,17 @@ for (const dialect of DIALECTS) {
           sql: `insert into "person" ("first_name", "last_name", "gender") values ((select max(name) as "max_name" from "pet"), 'Bar' || 'son', ?)`,
           parameters: ['other'],
         },
-      });
+      })
 
-      const result = await query.executeTakeFirst();
-      expect(result).to.be.instanceOf(InsertResult);
-      expect(result.numInsertedOrUpdatedRows).to.equal(1n);
+      const result = await query.executeTakeFirst()
+      expect(result).to.be.instanceOf(InsertResult)
+      expect(result.numInsertedOrUpdatedRows).to.equal(1n)
 
       expect(await getNewestPerson(ctx.db)).to.eql({
         first_name: 'Hammo',
         last_name: 'Barson',
-      });
-    });
+      })
+    })
 
     it.skip('should insert one row with expressions', async () => {
       const query = ctx.db.insertInto('person').values(({ selectFrom }) => ({
@@ -117,7 +117,7 @@ for (const dialect of DIALECTS) {
           .where('species', '=', 'dog')
           .limit(1),
         gender: 'female',
-      }));
+      }))
 
       testSql(query, dialect, {
         postgres: {
@@ -132,17 +132,17 @@ for (const dialect of DIALECTS) {
           sql: `insert into "person" ("first_name", "gender") values ((select "first_name" from "person" where "last_name" = ? limit ?), ?)`,
           parameters: ['Aniston', 1, 'female'],
         },
-      });
+      })
 
-      const result = await query.executeTakeFirst();
-      expect(result).to.be.instanceOf(InsertResult);
-      expect(result.numInsertedOrUpdatedRows).to.equal(1n);
+      const result = await query.executeTakeFirst()
+      expect(result).to.be.instanceOf(InsertResult)
+      expect(result.numInsertedOrUpdatedRows).to.equal(1n)
 
       expect(await getNewestPerson(ctx.db)).to.eql({
         first_name: 'Jennifer',
         last_name: null,
-      });
-    });
+      })
+    })
 
     it('should insert the result of a select query', async () => {
       const query = ctx.db
@@ -150,7 +150,7 @@ for (const dialect of DIALECTS) {
         .columns(['first_name', 'gender'])
         .expression((eb) =>
           eb.selectFrom('pet').select(['name', sql`${'other'}`.as('gender')])
-        );
+        )
 
       testSql(query, dialect, {
         postgres: {
@@ -165,23 +165,23 @@ for (const dialect of DIALECTS) {
           sql: 'insert into "person" ("first_name", "gender") select "name", ? as "gender" from "pet"',
           parameters: ['other'],
         },
-      });
+      })
 
-      const result = await query.executeTakeFirst();
-      expect(result).to.be.instanceOf(InsertResult);
+      const result = await query.executeTakeFirst()
+      expect(result).to.be.instanceOf(InsertResult)
 
       const { pet_count } = await ctx.db
         .selectFrom('pet')
         .select(sql<string | number | bigint>`count(*)`.as('pet_count'))
-        .executeTakeFirstOrThrow();
+        .executeTakeFirstOrThrow()
 
-      expect(result.numInsertedOrUpdatedRows).to.equal(BigInt(pet_count));
+      expect(result.numInsertedOrUpdatedRows).to.equal(BigInt(pet_count))
 
       const persons = await ctx.db
         .selectFrom('person')
         .select('first_name')
         .orderBy('first_name')
-        .execute();
+        .execute()
 
       expect(persons.map((it) => it.first_name)).to.eql([
         'Arnold',
@@ -190,8 +190,8 @@ for (const dialect of DIALECTS) {
         'Hammo',
         'Jennifer',
         'Sylvester',
-      ]);
-    });
+      ])
+    })
 
     if (dialect === 'postgres') {
       it('should insert the result of a values expression', async () => {
@@ -211,7 +211,7 @@ for (const dialect of DIALECTS) {
               )
               .select(['t.a', 't.b'])
           )
-          .returning(['first_name', 'gender']);
+          .returning(['first_name', 'gender'])
 
         testSql(query, dialect, {
           postgres: {
@@ -220,16 +220,16 @@ for (const dialect of DIALECTS) {
           },
           mysql: NOT_SUPPORTED,
           sqlite: NOT_SUPPORTED,
-        });
+        })
 
-        const result = await query.execute();
+        const result = await query.execute()
 
-        expect(result).to.have.length(2);
+        expect(result).to.have.length(2)
         expect(result).to.deep.equal([
           { first_name: '1', gender: 'foo' },
           { first_name: '2', gender: 'bar' },
-        ]);
-      });
+        ])
+      })
     }
 
     it('undefined values should be ignored', async () => {
@@ -238,7 +238,7 @@ for (const dialect of DIALECTS) {
         first_name: 'Foo',
         last_name: 'Barson',
         gender: 'other',
-      });
+      })
 
       testSql(query, dialect, {
         postgres: {
@@ -253,19 +253,19 @@ for (const dialect of DIALECTS) {
           sql: 'insert into "person" ("first_name", "last_name", "gender") values (?, ?, ?)',
           parameters: ['Foo', 'Barson', 'other'],
         },
-      });
+      })
 
-      const result = await query.executeTakeFirst();
+      const result = await query.executeTakeFirst()
 
-      expect(result).to.be.instanceOf(InsertResult);
-      expect(result.numInsertedOrUpdatedRows).to.equal(1n);
+      expect(result).to.be.instanceOf(InsertResult)
+      expect(result.numInsertedOrUpdatedRows).to.equal(1n)
 
       if (dialect === 'postgres') {
-        expect(result.insertId).to.be.undefined;
+        expect(result.insertId).to.be.undefined
       } else {
-        expect(result.insertId).to.be.a('bigint');
+        expect(result.insertId).to.be.a('bigint')
       }
-    });
+    })
 
     if (dialect === 'mysql') {
       it('should insert one row and ignore conflicts using insert ignore', async () => {
@@ -273,9 +273,9 @@ for (const dialect of DIALECTS) {
           .selectFrom('pet')
           .selectAll()
           .limit(1)
-          .execute();
+          .execute()
 
-        const query = ctx.db.insertInto('pet').ignore().values(existingPet);
+        const query = ctx.db.insertInto('pet').ignore().values(existingPet)
 
         testSql(query, dialect, {
           mysql: {
@@ -288,14 +288,14 @@ for (const dialect of DIALECTS) {
           },
           postgres: NOT_SUPPORTED,
           sqlite: NOT_SUPPORTED,
-        });
+        })
 
-        const result = await query.executeTakeFirst();
+        const result = await query.executeTakeFirst()
 
-        expect(result).to.be.instanceOf(InsertResult);
-        expect(result.insertId).to.be.undefined;
-        expect(result.numInsertedOrUpdatedRows).to.equal(0n);
-      });
+        expect(result).to.be.instanceOf(InsertResult)
+        expect(result.insertId).to.be.undefined
+        expect(result.numInsertedOrUpdatedRows).to.equal(0n)
+      })
     }
 
     if (dialect !== 'mysql') {
@@ -304,12 +304,12 @@ for (const dialect of DIALECTS) {
           .selectFrom('pet')
           .selectAll()
           .limit(1)
-          .execute();
+          .execute()
 
         const query = ctx.db
           .insertInto('pet')
           .values(existingPet)
-          .onConflict((oc) => oc.column('name').doNothing());
+          .onConflict((oc) => oc.column('name').doNothing())
 
         testSql(query, dialect, {
           postgres: {
@@ -329,20 +329,20 @@ for (const dialect of DIALECTS) {
             ],
           },
           mysql: NOT_SUPPORTED,
-        });
+        })
 
-        const result = await query.executeTakeFirst();
+        const result = await query.executeTakeFirst()
 
-        expect(result).to.be.instanceOf(InsertResult);
-        expect(result.numInsertedOrUpdatedRows).to.equal(0n);
+        expect(result).to.be.instanceOf(InsertResult)
+        expect(result.numInsertedOrUpdatedRows).to.equal(0n)
 
         if (dialect === 'sqlite') {
           // SQLite seems to return the last inserted id even if nothing got inserted.
-          expect(result.insertId! > 0n).to.be.equal(true);
+          expect(result.insertId! > 0n).to.be.equal(true)
         } else {
-          expect(result.insertId).to.be.undefined;
+          expect(result.insertId).to.be.undefined
         }
-      });
+      })
     }
 
     if (dialect === 'postgres') {
@@ -351,12 +351,12 @@ for (const dialect of DIALECTS) {
           .selectFrom('pet')
           .selectAll()
           .limit(1)
-          .execute();
+          .execute()
 
         const query = ctx.db
           .insertInto('pet')
           .values(existingPet)
-          .onConflict((oc) => oc.constraint('pet_name_key').doNothing());
+          .onConflict((oc) => oc.constraint('pet_name_key').doNothing())
 
         testSql(query, dialect, {
           postgres: {
@@ -369,14 +369,14 @@ for (const dialect of DIALECTS) {
           },
           mysql: NOT_SUPPORTED,
           sqlite: NOT_SUPPORTED,
-        });
+        })
 
-        const result = await query.executeTakeFirst();
+        const result = await query.executeTakeFirst()
 
-        expect(result).to.be.instanceOf(InsertResult);
-        expect(result.insertId).to.be.undefined;
-        expect(result.numInsertedOrUpdatedRows).to.equal(0n);
-      });
+        expect(result).to.be.instanceOf(InsertResult)
+        expect(result.insertId).to.be.undefined
+        expect(result.numInsertedOrUpdatedRows).to.equal(0n)
+      })
     }
 
     if (dialect === 'mysql') {
@@ -385,12 +385,12 @@ for (const dialect of DIALECTS) {
           .selectFrom('pet')
           .selectAll()
           .limit(1)
-          .execute();
+          .execute()
 
         const query = ctx.db
           .insertInto('pet')
           .values(existingPet)
-          .onDuplicateKeyUpdate({ species: 'hamster' });
+          .onDuplicateKeyUpdate({ species: 'hamster' })
 
         testSql(query, dialect, {
           mysql: {
@@ -404,25 +404,25 @@ for (const dialect of DIALECTS) {
           },
           postgres: NOT_SUPPORTED,
           sqlite: NOT_SUPPORTED,
-        });
+        })
 
-        const result = await query.executeTakeFirst();
+        const result = await query.executeTakeFirst()
 
-        expect(result).to.be.instanceOf(InsertResult);
-        expect(result.insertId).to.equal(BigInt(id));
-        expect(result.numInsertedOrUpdatedRows).to.equal(2n);
+        expect(result).to.be.instanceOf(InsertResult)
+        expect(result.insertId).to.equal(BigInt(id))
+        expect(result.numInsertedOrUpdatedRows).to.equal(2n)
 
         const updatedPet = await ctx.db
           .selectFrom('pet')
           .selectAll()
           .where('id', '=', id)
-          .executeTakeFirstOrThrow();
+          .executeTakeFirstOrThrow()
 
         expect(updatedPet).to.containSubset({
           name: 'Catto',
           species: 'hamster',
-        });
-      });
+        })
+      })
     }
 
     if (dialect !== 'mysql') {
@@ -431,14 +431,14 @@ for (const dialect of DIALECTS) {
           .selectFrom('pet')
           .selectAll()
           .limit(1)
-          .execute();
+          .execute()
 
         const query = ctx.db
           .insertInto('pet')
           .values(existingPet)
           .onConflict((oc) =>
             oc.columns(['name']).doUpdateSet({ species: 'hamster' })
-          );
+          )
 
         testSql(query, dialect, {
           postgres: {
@@ -460,30 +460,30 @@ for (const dialect of DIALECTS) {
               'hamster',
             ],
           },
-        });
+        })
 
-        const result = await query.executeTakeFirst();
+        const result = await query.executeTakeFirst()
 
-        expect(result).to.be.instanceOf(InsertResult);
-        expect(result.numInsertedOrUpdatedRows).to.equal(1n);
+        expect(result).to.be.instanceOf(InsertResult)
+        expect(result.numInsertedOrUpdatedRows).to.equal(1n)
 
         if (dialect === 'postgres') {
-          expect(result.insertId).to.be.undefined;
+          expect(result.insertId).to.be.undefined
         } else {
-          expect(result.insertId).to.be.a('bigint');
+          expect(result.insertId).to.be.a('bigint')
         }
 
         const updatedPet = await ctx.db
           .selectFrom('pet')
           .selectAll()
           .where('id', '=', id)
-          .executeTakeFirstOrThrow();
+          .executeTakeFirstOrThrow()
 
         expect(updatedPet).to.containSubset({
           name: 'Catto',
           species: 'hamster',
-        });
-      });
+        })
+      })
     }
 
     if (dialect === 'postgres') {
@@ -492,7 +492,7 @@ for (const dialect of DIALECTS) {
           .selectFrom('pet')
           .selectAll()
           .limit(1)
-          .execute();
+          .execute()
 
         const query = ctx.db
           .insertInto('pet')
@@ -500,7 +500,7 @@ for (const dialect of DIALECTS) {
           .onConflict((oc) =>
             oc.constraint('pet_name_key').doUpdateSet({ species: 'hamster' })
           )
-          .returningAll();
+          .returningAll()
 
         testSql(query, dialect, {
           postgres: {
@@ -514,22 +514,22 @@ for (const dialect of DIALECTS) {
           },
           mysql: NOT_SUPPORTED,
           sqlite: NOT_SUPPORTED,
-        });
+        })
 
-        const result = await query.executeTakeFirst();
+        const result = await query.executeTakeFirst()
 
         expect(result).to.containSubset({
           name: 'Catto',
           species: 'hamster',
-        });
-      });
+        })
+      })
 
       it('should update instead of insert on conflict when using `on conflict do update where`', async () => {
         const [{ id, ...existingPet }] = await ctx.db
           .selectFrom('pet')
           .selectAll()
           .limit(1)
-          .execute();
+          .execute()
 
         const query = ctx.db
           .insertInto('pet')
@@ -544,7 +544,7 @@ for (const dialect of DIALECTS) {
               })
               .where('excluded.name', '!=', 'Doggo')
           )
-          .returningAll();
+          .returningAll()
 
         testSql(query, dialect, {
           postgres: {
@@ -560,16 +560,16 @@ for (const dialect of DIALECTS) {
           },
           mysql: NOT_SUPPORTED,
           sqlite: NOT_SUPPORTED,
-        });
+        })
 
-        const result = await query.execute();
+        const result = await query.execute()
 
-        expect(result).to.have.length(1);
+        expect(result).to.have.length(1)
         expect(result[0]).to.containSubset({
           species: 'hamster',
           name: 'Catto',
-        });
-      });
+        })
+      })
     }
 
     it('should insert multiple rows', async () => {
@@ -584,7 +584,7 @@ for (const dialect of DIALECTS) {
           last_name: 'Spam',
           gender: 'other',
         },
-      ]);
+      ])
 
       testSql(query, dialect, {
         postgres: {
@@ -599,17 +599,17 @@ for (const dialect of DIALECTS) {
           sql: 'insert into "person" ("first_name", "last_name", "gender") values (?, ?, ?), (?, ?, ?)',
           parameters: ['Foo', 'Bar', 'other', 'Baz', 'Spam', 'other'],
         },
-      });
+      })
 
-      const result = await query.executeTakeFirst();
+      const result = await query.executeTakeFirst()
 
-      expect(result).to.be.instanceOf(InsertResult);
-      expect(result.numInsertedOrUpdatedRows).to.equal(2n);
+      expect(result).to.be.instanceOf(InsertResult)
+      expect(result.numInsertedOrUpdatedRows).to.equal(2n)
 
       if (dialect === 'postgres') {
-        expect(result.insertId).to.be.undefined;
+        expect(result.insertId).to.be.undefined
       } else {
-        expect(result.insertId).to.be.a('bigint');
+        expect(result.insertId).to.be.a('bigint')
       }
 
       const inserted = await ctx.db
@@ -617,13 +617,13 @@ for (const dialect of DIALECTS) {
         .selectAll()
         .orderBy('id', 'desc')
         .limit(2)
-        .execute();
+        .execute()
 
       expect(inserted).to.containSubset([
         { first_name: 'Foo', last_name: 'Bar', gender: 'other' },
         { first_name: 'Baz', last_name: 'Spam', gender: 'other' },
-      ]);
-    });
+      ])
+    })
 
     it('should insert multiple rows while falling back to default values in partial rows - missing columns', async () => {
       const query = ctx.db.insertInto('person').values([
@@ -639,7 +639,7 @@ for (const dialect of DIALECTS) {
           middle_name: 'Bo',
           gender: 'other',
         },
-      ]);
+      ])
 
       testSql(query, dialect, {
         postgres: {
@@ -654,10 +654,10 @@ for (const dialect of DIALECTS) {
           sql: 'insert into "person" ("first_name", "gender", "last_name", "middle_name") values (?, ?, null, null), (?, ?, ?, ?)',
           parameters: ['Foo', 'other', 'Baz', 'other', 'Spam', 'Bo'],
         },
-      });
+      })
 
-      await query.execute();
-    });
+      await query.execute()
+    })
 
     it('should insert multiple rows while falling back to default values in partial rows - undefined columns', async () => {
       const query = ctx.db.insertInto('person').values([
@@ -673,7 +673,7 @@ for (const dialect of DIALECTS) {
           middle_name: undefined,
           gender: 'other',
         },
-      ]);
+      ])
 
       testSql(query, dialect, {
         postgres: {
@@ -688,10 +688,10 @@ for (const dialect of DIALECTS) {
           sql: 'insert into "person" ("first_name", "last_name", "middle_name", "gender") values (?, ?, ?, ?), (?, null, null, ?)',
           parameters: ['Foo', 'Spam', 'Bo', 'other', 'Baz', 'other'],
         },
-      });
+      })
 
-      await query.execute();
-    });
+      await query.execute()
+    })
 
     it('should insert multiple rows while falling back to default values in partial rows - undefined/missing columns', async () => {
       const query = ctx.db.insertInto('person').values([
@@ -707,7 +707,7 @@ for (const dialect of DIALECTS) {
           middle_name: undefined,
           gender: 'other',
         },
-      ]);
+      ])
 
       testSql(query, dialect, {
         postgres: {
@@ -722,10 +722,10 @@ for (const dialect of DIALECTS) {
           sql: 'insert into "person" ("first_name", "middle_name", "gender", "last_name") values (?, ?, ?, null), (?, null, ?, ?)',
           parameters: ['Foo', 'Bo', 'other', 'Baz', 'other', 'Spam'],
         },
-      });
+      })
 
-      await query.execute();
-    });
+      await query.execute()
+    })
 
     if (dialect === 'postgres' || dialect === 'sqlite') {
       it('should insert a row and return data using `returning`', async () => {
@@ -742,21 +742,21 @@ for (const dialect of DIALECTS) {
                 : sql`cast(${'Bar'} as varchar) || cast(${'son'} as varchar)`,
           })
           .returning(['first_name', 'last_name', 'gender'])
-          .executeTakeFirst();
+          .executeTakeFirst()
 
         expect(result).to.eql({
           first_name: 'Sylvester',
           last_name: 'Barson',
           gender: 'other',
-        });
+        })
 
         expect(await getNewestPerson(ctx.db)).to.eql({
           first_name: 'Sylvester',
           last_name: 'Barson',
-        });
+        })
 
         it('should insert a row, returning some fields of inserted row and conditionally returning additional fields', async () => {
-          const condition = true;
+          const condition = true
 
           const query = ctx.db
             .insertInto('person')
@@ -766,13 +766,13 @@ for (const dialect of DIALECTS) {
               gender: 'other',
             })
             .returning('first_name')
-            .$if(condition, (qb) => qb.returning('last_name'));
+            .$if(condition, (qb) => qb.returning('last_name'))
 
-          const result = await query.executeTakeFirstOrThrow();
+          const result = await query.executeTakeFirstOrThrow()
 
-          expect(result.last_name).to.equal('Barson');
-        });
-      });
+          expect(result.last_name).to.equal('Barson')
+        })
+      })
 
       it('should insert a row and return data using `returningAll`', async () => {
         const result = await ctx.db
@@ -788,19 +788,19 @@ for (const dialect of DIALECTS) {
                 : sql`cast(${'Bar'} as varchar) || cast(${'son'} as varchar)`,
           })
           .returningAll()
-          .executeTakeFirst();
+          .executeTakeFirst()
 
         expect(result).to.containSubset({
           first_name: 'Sylvester',
           last_name: 'Barson',
           gender: 'other',
-        });
+        })
 
         expect(await getNewestPerson(ctx.db)).to.eql({
           first_name: 'Sylvester',
           last_name: 'Barson',
-        });
-      });
+        })
+      })
     }
 
     if (dialect === 'postgres') {
@@ -816,25 +816,25 @@ for (const dialect of DIALECTS) {
             last_name: 'Badu',
             gender: 'female',
           },
-        ] as const;
+        ] as const
 
         const stream = ctx.db
           .insertInto('person')
           .values(values)
           .returning(['first_name', 'last_name', 'gender'])
-          .stream();
+          .stream()
 
-        const people = [];
+        const people = []
 
         for await (const person of stream) {
-          people.push(person);
+          people.push(person)
         }
 
-        expect(people).to.have.length(values.length);
-        expect(people).to.eql(values);
-      });
+        expect(people).to.have.length(values.length)
+        expect(people).to.eql(values)
+      })
     }
-  });
+  })
 
   async function getNewestPerson(
     db: Kysely<Database>
@@ -847,7 +847,7 @@ for (const dialect of DIALECTS) {
         '=',
         db.selectFrom('person').select(sql<number>`max(id)`.as('max_id'))
       )
-      .executeTakeFirst();
+      .executeTakeFirst()
   }
 }
 
@@ -855,17 +855,17 @@ function values<R extends Record<string, unknown>, A extends string>(
   records: R[],
   alias: A
 ): AliasedRawBuilder<R, A> {
-  const keys = Object.keys(records[0]);
+  const keys = Object.keys(records[0])
 
   const values = sql.join(
     records.map((r) => {
-      const v = sql.join(keys.map((k) => sql`${r[k]}`));
-      return sql`(${v})`;
+      const v = sql.join(keys.map((k) => sql`${r[k]}`))
+      return sql`(${v})`
     })
-  );
+  )
 
   return sql<R>`(values ${values})`.as<A>(
     sql.raw(`${alias}(${keys.join(', ')})`)
-  );
+  )
 }
 /* END UNCHANGED CODE */
