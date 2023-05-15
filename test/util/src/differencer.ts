@@ -1,14 +1,15 @@
 import { promises as fsp } from 'fs'
+import { join } from 'path'
 
-const SOURCE_CODE_PATH = '/src'
-const TEST_CODE_PATH = '/test/node'
+export const SOURCE_CODE_PATH = '/src'
+export const TEST_CODE_PATH = '/test/node'
+
 const ADAPTED_FROM_REGEX = /Adapted from ([^\s]+)/i
 const BEGIN_UNCHANGED_LABEL = 'BEGIN UNCHANGED CODE'
 const END_UNCHANGED_LABEL = 'END UNCHANGED CODE'
+const MOCK_FILES_DIR = join(__dirname, '../mock-kysely-files')
 
 let differingCodeSegments = 0
-
-;(async () => diffFiles())()
 
 async function diffFiles(): Promise<void> {
   await diffSourceFiles()
@@ -21,11 +22,12 @@ async function diffFiles(): Promise<void> {
 
 async function diffSourceFiles(): Promise<void> {
   for await (const path of iterateOverTypeScriptFiles(`.${SOURCE_CODE_PATH}`)) {
+    const localFileName = path.substring(path.lastIndexOf('/') + 1)
     const sourceText = await fsp.readFile(path, 'utf-8')
     const match = sourceText.match(ADAPTED_FROM_REGEX)
     if (match) {
       const url = createSourceTargetURL(match[1])
-      const kyselyText = await loadFileFromURL(url)
+      const kyselyText = await loadFileFromURL(localFileName, url)
       diffText(path, sourceText, kyselyText)
     }
   }
@@ -33,9 +35,10 @@ async function diffSourceFiles(): Promise<void> {
 
 async function diffTestFiles(): Promise<void> {
   for await (const path of iterateOverTypeScriptFiles(`.${TEST_CODE_PATH}`)) {
+    const localFileName = path.substring(path.lastIndexOf('/') + 1)
     const testText = await fsp.readFile(path, 'utf-8')
     const url = createTestTargetURL(path)
-    const kyselyText = await loadFileFromURL(url)
+    const kyselyText = await loadFileFromURL(localFileName, url)
     diffText(path, testText, kyselyText)
   }
 }
@@ -69,15 +72,48 @@ async function* iterateOverTypeScriptFiles(
     const stat = await fsp.stat(path)
     if (stat.isDirectory()) {
       yield* iterateOverTypeScriptFiles(path)
-    } else if (file.endsWith('.ts')) {
+    } else if (file.endsWith('.ts') && !file.endsWith('.d.ts')) {
       yield path
     }
   }
 }
 
-async function loadFileFromURL(url: string): Promise<string> {
-  const response = await fetch(url)
-  return await response.text()
+async function loadFileFromURL(
+  localFileName: string,
+  url: string
+): Promise<string> {
+  if (process.argv.length <= 2 || process.argv[2] !== 'mock-fetch') {
+    const response = await fetch(url)
+    return await response.text()
+  }
+
+  const urlToLocalDir = {
+    'src/dialect/postgres/postgres-': 'src/lib/postgres-client-',
+    'src/util/': 'src/lib/utils/',
+    'test/node/src/': 'test/node/src/',
+  }
+  const mockFileNames = await fsp.readdir(MOCK_FILES_DIR)
+
+  for (const mockFileName of mockFileNames) {
+    const mockFilePath = join(MOCK_FILES_DIR, mockFileName)
+    if (mockFileName == localFileName) {
+      return await fsp.readFile(mockFilePath, 'utf-8')
+    }
+  }
+  const urlToLocal = Object.entries(urlToLocalDir).find(([key]) =>
+    url.includes(key)
+  )
+  if (!urlToLocal) {
+    throw Error(`No local path given for URL ${url}`)
+  }
+  const localFilePath = join(
+    __dirname,
+    '../../../',
+    url
+      .substring(url.indexOf(urlToLocal[0]))
+      .replace(urlToLocal[0], urlToLocal[1])
+  )
+  return await fsp.readFile(localFilePath, 'utf-8')
 }
 
 function diffText(path: string, sourceText: string, kyselyText: string): void {
@@ -106,9 +142,9 @@ function diffText(path: string, sourceText: string, kyselyText: string): void {
       kyselyLines
     )
     if (firstDifferingLineIndex >= 0) {
-      console.error(`${path} differs from Kysely source at line:`)
+      console.error(`${path}: differs from Kysely source`)
       console.error(
-        ` ${nextUnchangedLineIndex + firstDifferingLineIndex + 1}: ${
+        `  ${nextUnchangedLineIndex + firstDifferingLineIndex + 1}: ${
           unchangedLines[firstDifferingLineIndex]
         }`
       )
@@ -170,3 +206,5 @@ function findFirstDifferingLine(
   }
   return lastDifferentLineIndex
 }
+
+;(async () => diffFiles())()

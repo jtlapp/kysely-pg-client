@@ -15,7 +15,7 @@ import {
   PLUGINS,
   DIALECT_CONFIGS,
   Database,
-} from './test-setup.js'
+} from '../../node/src/test-setup'
 
 /* BEGIN UNCHANGED CODE | Copyright (c) 2022 Sami Koskimäki | MIT License */
 for (const dialect of DIALECTS) {
@@ -26,6 +26,7 @@ for (const dialect of DIALECTS) {
       ctx = await initTest(this, dialect)
     })
 
+    // different line 1
     beforeEach(async () => {
       await insertPersons(ctx, [
         {
@@ -802,5 +803,5 @@ for (const dialect of DIALECTS) {
       console.log((endTime - time) / N)
     })
   })
-}
+} // different line 2
 /* END UNCHANGED CODE */

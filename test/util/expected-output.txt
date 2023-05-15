@@ -1,0 +1,10 @@
+src/lib/postgres-client-dialect-config.ts: differs from Kysely source
+  36:   cursor?: PostgresCursorConstructor
+test/node/src/execute.test.ts: differs from Kysely source
+  13: } from './test-setup.js'
+test/node/src/select.test.ts: differs from Kysely source
+  29:     beforeEach(async () => {
+test/node/src/select.test.ts: differs from Kysely source
+  805: }
+
+4 differing code segments found
