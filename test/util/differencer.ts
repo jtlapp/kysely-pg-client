@@ -14,7 +14,7 @@ async function diffFiles(): Promise<void> {
   await diffSourceFiles()
   await diffTestFiles()
   if (differingCodeSegments > 0) {
-    console.log(`\n${differingCodeSegments} differing code segments found`)
+    console.error(`\n${differingCodeSegments} differing code segments found`)
     process.exit(1)
   }
 }
@@ -106,8 +106,8 @@ function diffText(path: string, sourceText: string, kyselyText: string): void {
       kyselyLines
     )
     if (firstDifferingLineIndex >= 0) {
-      console.log(`${path} differs from Kysely source at line:`)
-      console.log(
+      console.error(`${path} differs from Kysely source at line:`)
+      console.error(
         ` ${nextUnchangedLineIndex + firstDifferingLineIndex + 1}: ${
           unchangedLines[firstDifferingLineIndex]
         }`
