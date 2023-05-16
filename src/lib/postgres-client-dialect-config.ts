@@ -32,7 +32,7 @@ export interface PostgresClientDialectConfig {
    * })
    * ```
    */
-  /* BEGIN UNCHANGED CODE | Copyright (c) 2022 Sami Koskimäki | MIT License */
+  /* BEGIN SYNCED CODE | Copyright (c) 2022 Sami Koskimäki | MIT License */
   cursor?: PostgresCursorConstructor
-  /* END UNCHANGED CODE */
+  /* END SYNCED CODE */
 }

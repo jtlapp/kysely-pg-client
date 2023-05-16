@@ -13,6 +13,7 @@ specifiers:
   chai-as-promised: ^7.1.1
   chai-subset: ^1.6.0
   kysely: ^0.24.2
+  kysely-test-sync: 0.2.1
   mocha: ^10.0.0
   pg: ^8.7.3
   pg-cursor: ^2.7.3
@@ -35,6 +36,7 @@ devDependencies:
   chai: 4.3.7
   chai-as-promised: 7.1.1_chai@4.3.7
   chai-subset: 1.6.0
+  kysely-test-sync: 0.2.1
   mocha: 10.2.0
   pg: 8.10.0
   pg-cursor: 2.9.0_pg@8.10.0
@@ -464,6 +466,11 @@ packages:
 
   /just-extend/4.2.1:
     resolution: {integrity: sha512-g3UB796vUFIY90VIv/WX3L2c8CS2MdWUww3CNrYmqza1Fg0DURc2K/O4YrnklBdQarSJ/y8JnJYDGc+1iumQjg==}
+    dev: true
+
+  /kysely-test-sync/0.2.1:
+    resolution: {integrity: sha512-6m35Uu+iyMcitm8Wvddga+wu1NCK6wOplovuCcjXjEmv5Rq4MSeEAKVLwXdjyUf0caVN261jxcS9J7Wpvsf6bg==}
+    hasBin: true
     dev: true
 
   /kysely/0.24.2:

@@ -19,7 +19,7 @@ import {
 
 for (const dialect of DIALECTS) {
   describe(`${dialect}: custom select`, () => {
-    /* BEGIN UNCHANGED CODE | Copyright (c) 2022 Sami Koskimäki | MIT License */
+    /* BEGIN SYNCED CODE | Copyright (c) 2022 Sami Koskimäki | MIT License */
     let ctx: TestContext
 
     before(async function () {
@@ -62,35 +62,37 @@ for (const dialect of DIALECTS) {
     after(async () => {
       await destroyTest(ctx)
     })
-    /* END UNCHANGED CODE */
+    /* END SYNCED CODE */
 
-    /* BEGIN UNCHANGED CODE | Copyright (c) 2022 Sami Koskimäki | MIT License */
-    if (dialect === 'postgres') {
-      it('should throw an error if the cursor implementation is not provided for the postgres dialect', async () => {
-        /* END UNCHANGED CODE */
-        const db = new Kysely<Database>({
-          dialect: new PostgresClientDialect({
-            client: async () => new Client(DIALECT_CONFIGS.postgres),
-          }),
-          /* BEGIN UNCHANGED CODE | Copyright (c) 2022 Sami Koskimäki | MIT License */
-          plugins: PLUGINS,
+    {
+      /* BEGIN SYNCED CODE | Copyright (c) 2022 Sami Koskimäki | MIT License */
+      if (dialect === 'postgres') {
+        it('should throw an error if the cursor implementation is not provided for the postgres dialect', async () => {
+          /* END SYNCED CODE */
+          const db = new Kysely<Database>({
+            dialect: new PostgresClientDialect({
+              client: async () => new Client(DIALECT_CONFIGS.postgres),
+            }),
+            /* BEGIN SYNCED CODE | Copyright (c) 2022 Sami Koskimäki | MIT License */
+            plugins: PLUGINS,
+          })
+
+          await expect(
+            (async () => {
+              for await (const _ of db
+                .selectFrom('person')
+                .selectAll()
+                .stream()) {
+              }
+            })()
+          ).to.be.rejectedWith(
+            "'cursor' is not present in your postgres dialect config. It's required to make streaming work in postgres."
+          )
+
+          await db.destroy()
         })
-
-        await expect(
-          (async () => {
-            for await (const _ of db
-              .selectFrom('person')
-              .selectAll()
-              .stream()) {
-            }
-          })()
-        ).to.be.rejectedWith(
-          "'cursor' is not present in your postgres dialect config. It's required to make streaming work in postgres."
-        )
-
-        await db.destroy()
-      })
+      }
+      /* END SYNCED CODE */
     }
   })
 }
-/* END UNCHANGED CODE */

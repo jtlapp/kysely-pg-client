@@ -13,7 +13,7 @@ import {
 
 for (const dialect of DIALECTS) {
   describe(`${dialect}: custom transaction`, () => {
-    /* BEGIN UNCHANGED CODE | Copyright (c) 2022 Sami Koskimäki | MIT License */
+    /* BEGIN SYNCED CODE | Copyright (c) 2022 Sami Koskimäki | MIT License */
     let ctx: TestContext
     let executedQueries: CompiledQuery[] = []
 
@@ -37,7 +37,7 @@ for (const dialect of DIALECTS) {
     after(async () => {
       await destroyTest(ctx)
     })
-    /* END UNCHANGED CODE */
+    /* END SYNCED CODE */
 
     it('should commit a successful transaction', async () => {
       const personID = 1000
@@ -87,7 +87,7 @@ for (const dialect of DIALECTS) {
       }
     })
 
-    /* BEGIN UNCHANGED CODE | Copyright (c) 2022 Sami Koskimäki | MIT License */
+    /* BEGIN SYNCED CODE | Copyright (c) 2022 Sami Koskimäki | MIT License */
     async function insertPet(
       trx: Transaction<Database>,
       ownerId: number
@@ -136,4 +136,4 @@ for (const dialect of DIALECTS) {
     }
   })
 }
-/* END UNCHANGED CODE */
+/* END SYNCED CODE */

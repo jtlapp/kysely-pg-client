@@ -50,7 +50,7 @@ export class PostgresClientDriver implements Driver {
     return this.#connection
   }
 
-  /* BEGIN UNCHANGED CODE | Copyright (c) 2022 Sami Koskimäki | MIT License */
+  /* BEGIN SYNCED CODE | Copyright (c) 2022 Sami Koskimäki | MIT License */
   async beginTransaction(
     connection: DatabaseConnection,
     settings: TransactionSettings
@@ -73,7 +73,7 @@ export class PostgresClientDriver implements Driver {
   async rollbackTransaction(connection: DatabaseConnection): Promise<void> {
     await connection.executeQuery(CompiledQuery.raw('rollback'))
   }
-  /* END UNCHANGED CODE */
+  /* END SYNCED CODE */
 
   async releaseConnection(connection: PostgresClientConnection): Promise<void> {
     if (connection !== this.#connection) {
@@ -105,7 +105,7 @@ class PostgresClientConnection implements DatabaseConnection {
     this.#options = options
   }
 
-  /* BEGIN UNCHANGED CODE | Copyright (c) 2022 Sami Koskimäki | MIT License */
+  /* BEGIN SYNCED CODE | Copyright (c) 2022 Sami Koskimäki | MIT License */
   async executeQuery<O>(compiledQuery: CompiledQuery): Promise<QueryResult<O>> {
     try {
       const result = await this.#client.query<O>(compiledQuery.sql, [
@@ -172,5 +172,5 @@ class PostgresClientConnection implements DatabaseConnection {
       await cursor.close()
     }
   }
-  /* END UNCHANGED CODE */
+  /* END SYNCED CODE */
 }

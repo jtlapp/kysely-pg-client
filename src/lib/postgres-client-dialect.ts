@@ -32,7 +32,7 @@ export class PostgresClientDialect implements Dialect {
     return new PostgresClientDriver(this.#config)
   }
 
-  /* BEGIN UNCHANGED CODE | Copyright (c) 2022 Sami Koskimäki | MIT License */
+  /* BEGIN SYNCED CODE | Copyright (c) 2022 Sami Koskimäki | MIT License */
   createQueryCompiler(): QueryCompiler {
     return new PostgresQueryCompiler()
   }
@@ -44,5 +44,5 @@ export class PostgresClientDialect implements Dialect {
   createIntrospector(db: Kysely<any>): DatabaseIntrospector {
     return new PostgresIntrospector(db)
   }
-  /* END UNCHANGED CODE */
+  /* END SYNCED CODE */
 }

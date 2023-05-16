@@ -1,5 +1,6 @@
 {
-  "test-files": {
+  "copyDirs": ["src", "test/node/src"],
+  "testFiles": {
     "delete": [],
     "execute": [],
     "insert": [],
@@ -10,5 +11,7 @@
     ],
     "transaction": ["should run multiple transactions in parallel"],
     "update": []
-  }
+  },
+  "downloadedTestsDir": "test/node/src/temp",
+  "customSetupFile": "../custom-test-setup.js"
 }

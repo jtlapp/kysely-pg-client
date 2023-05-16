@@ -4,7 +4,7 @@
 
 import { isObject, isString } from './object-utils.js'
 
-/* BEGIN UNCHANGED CODE | Copyright (c) 2022 Sami Koskimäki | MIT License */
+/* BEGIN SYNCED CODE | Copyright (c) 2022 Sami Koskimäki | MIT License */
 export function extendStackTrace(err: unknown, stackError: Error): unknown {
   if (isStackHolder(err) && stackError.stack) {
     // Remove the first line that just says `Error`.
@@ -24,4 +24,4 @@ interface StackHolder {
 function isStackHolder(obj: unknown): obj is StackHolder {
   return isObject(obj) && isString(obj.stack)
 }
-/* END UNCHANGED CODE */
+/* END SYNCED CODE */

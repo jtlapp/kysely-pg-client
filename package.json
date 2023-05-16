@@ -1,6 +1,6 @@
 {
   "name": "kysely-pg-client",
-  "version": "0.4.13",
+  "version": "0.1.0",
   "author": "Joseph T. Lapp <arachnojoe@gmail.com>",
   "license": "MIT",
   "description": "Non-pooling single-connection Postgres dialect for Kysely",
@@ -32,14 +32,11 @@
     }
   },
   "scripts": {
-    "clean": "rm -rf node_modules & rm -rf dist & rm -rf test/node/dist",
+    "clean": "rm -rf node_modules & rm -rf dist & rm -rf test/node/dist & rm -rf test/node/src/temp",
     "format": "prettier --write \"**/*.{js,ts,tsx,md}\"",
-    "build": "rm -rdf dist && tsc && tsc -p tsconfig-cjs.json",
-    "diffs": "node test/util/dist/differencer.js",
-    "test": "npm run build && npm run test:build && npm run test:util && npm run test:node",
-    "test:build": "rm -rdf test/util/dist && rm -rdf test/node/dist && tsc -p test/util && npm run test:install && tsc -p test/node",
-    "test:util": "mocha --timeout 15000 test/util/dist/**/*.test.js",
-    "test:install": "rm -rdf test/node/src/temp && node test/util/dist/install-tests.js",
+    "build": "rm -rdf dist && tsc && npx check-synced-code && tsc -p tsconfig-cjs.json",
+    "test": "npm run build && npm run test:build && npm run test:node",
+    "test:build": "rm -rdf test/node/dist && npx check-synced-code && npx load-kysely-tests && tsc -p test/node",
     "test:node": "DIALECT=postgres mocha --timeout 15000 'test/node/dist/**/*.test.js'"
   },
   "dependencies": {
@@ -57,6 +54,7 @@
     "chai": "^4.3.6",
     "chai-as-promised": "^7.1.1",
     "chai-subset": "^1.6.0",
+    "kysely-test-sync": "0.2.1",
     "mocha": "^10.0.0",
     "pg": "^8.7.3",
     "pg-cursor": "^2.7.3",

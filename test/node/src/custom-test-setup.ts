@@ -4,10 +4,10 @@ import * as chaiSubset from 'chai-subset'
 import * as Cursor from 'pg-cursor'
 import { Client } from 'pg'
 
-/* BEGIN UNCHANGED CODE | Copyright (c) 2022 Sami Koskimäki | MIT License */
+/* BEGIN SYNCED CODE | Copyright (c) 2022 Sami Koskimäki | MIT License */
 chai.use(chaiSubset)
 chai.use(chaiAsPromised)
-/* END UNCHANGED CODE */
+/* END SYNCED CODE */
 
 import {
   Kysely,
@@ -31,7 +31,7 @@ import {
 } from 'kysely'
 import { PostgresClientDialect } from '../../../dist/cjs'
 
-/* BEGIN UNCHANGED CODE | Copyright (c) 2022 Sami Koskimäki | MIT License */
+/* BEGIN SYNCED CODE | Copyright (c) 2022 Sami Koskimäki | MIT License */
 export interface Person {
   id: Generated<number>
   first_name: string | null
@@ -75,7 +75,7 @@ export interface TestContext {
   config: KyselyConfig
   db: Kysely<Database>
 }
-/* END UNCHANGED CODE */
+/* END SYNCED CODE */
 
 export type BuiltInDialect = string
 export type PerDialect<T> = Record<BuiltInDialect, T>
@@ -84,7 +84,7 @@ export const DIALECTS: BuiltInDialect[] = (['postgres'] as const).filter(
   (d) => !process.env.DIALECT || d === process.env.DIALECT
 )
 
-/* BEGIN UNCHANGED CODE | Copyright (c) 2022 Sami Koskimäki | MIT License */
+/* BEGIN SYNCED CODE | Copyright (c) 2022 Sami Koskimäki | MIT License */
 const TEST_INIT_TIMEOUT = 5 * 60 * 1000
 // This can be used as a placeholder for testSql when a query is not
 // supported on some dialect.
@@ -101,7 +101,7 @@ if (process.env.TEST_TRANSFORMER) {
 }
 
 export const POOL_SIZE = 20
-/* END UNCHANGED CODE */
+/* END SYNCED CODE */
 
 export const DIALECT_CONFIGS = {
   postgres: {
@@ -122,7 +122,7 @@ const DB_CONFIGS: PerDialect<KyselyConfig> = {
   },
 }
 
-/* BEGIN UNCHANGED CODE | Copyright (c) 2022 Sami Koskimäki | MIT License */
+/* BEGIN SYNCED CODE | Copyright (c) 2022 Sami Koskimäki | MIT License */
 export async function initTest(
   ctx: Mocha.Context,
   dialect: BuiltInDialect,
@@ -357,4 +357,4 @@ function createNoopTransformerPlugin(): KyselyPlugin {
 function sleep(millis: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, millis))
 }
-/* END UNCHANGED CODE */
+/* END SYNCED CODE */
