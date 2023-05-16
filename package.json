@@ -1,6 +1,6 @@
 {
   "name": "kysely-pg-client",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "author": "Joseph T. Lapp <arachnojoe@gmail.com>",
   "license": "MIT",
   "description": "Non-pooling single-connection Postgres dialect for Kysely",
@@ -36,7 +36,7 @@
     "format": "prettier --write \"**/*.{js,ts,tsx,md}\"",
     "build": "rm -rdf dist && tsc && npx check-synced-code && tsc -p tsconfig-cjs.json",
     "test": "npm run build && npm run test:build && npm run test:node",
-    "test:build": "rm -rdf test/node/dist && npx check-synced-code && npx load-kysely-tests && tsc -p test/node",
+    "test:build": "rm -rdf test/node/dist && npx load-kysely-tests && tsc -p test/node",
     "test:node": "DIALECT=postgres mocha --timeout 15000 'test/node/dist/**/*.test.js'"
   },
   "dependencies": {
@@ -54,7 +54,7 @@
     "chai": "^4.3.6",
     "chai-as-promised": "^7.1.1",
     "chai-subset": "^1.6.0",
-    "kysely-test-sync": "0.2.1",
+    "kysely-test-sync": "0.2.3",
     "mocha": "^10.0.0",
     "pg": "^8.7.3",
     "pg-cursor": "^2.7.3",

@@ -3,6 +3,7 @@ import * as chaiAsPromised from 'chai-as-promised'
 import * as chaiSubset from 'chai-subset'
 import * as Cursor from 'pg-cursor'
 import { Client } from 'pg'
+import { Context as MochaContext } from 'mocha'
 
 /* BEGIN SYNCED CODE | Copyright (c) 2022 Sami Koskimäki | MIT License */
 chai.use(chaiSubset)
@@ -30,6 +31,10 @@ import {
   InsertObject,
 } from 'kysely'
 import { PostgresClientDialect } from '../../../dist/cjs'
+
+export function reportMochaContext(_cx: MochaContext): void {
+  // not needed
+}
 
 /* BEGIN SYNCED CODE | Copyright (c) 2022 Sami Koskimäki | MIT License */
 export interface Person {
