@@ -1,4 +1,4 @@
-// Adapted from https://github.com/kysely-org/kysely/blob/master/src/util/stack-trace-utils.ts
+// SYNC WITH https://github.com/kysely-org/kysely/blob/master/src/util/stack-trace-utils.ts
 // Unchanged code appears between BEGIN and END comments. If these sections
 // ever become different from the Kysely code, they should be updated here.
 

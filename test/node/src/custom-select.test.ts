@@ -1,4 +1,4 @@
-// Adapted from https://github.com/kysely-org/kysely/blob/master/test/node/src/select.test.ts
+// SYNC WITH https://github.com/kysely-org/kysely/blob/master/test/node/src/select.test.ts
 
 import { Kysely } from 'kysely'
 import { Client } from 'pg'
