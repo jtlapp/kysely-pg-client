@@ -1,3 +1,5 @@
+// Adapted from https://github.com/kysely-org/kysely/blob/master/test/node/src/test-setup.ts
+
 import * as chai from 'chai'
 import * as chaiAsPromised from 'chai-as-promised'
 import * as chaiSubset from 'chai-subset'
