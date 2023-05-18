@@ -54,7 +54,7 @@
     "chai": "^4.3.6",
     "chai-as-promised": "^7.1.1",
     "chai-subset": "^1.6.0",
-    "kysely-test-sync": "0.4.2",
+    "kysely-test-sync": "0.5.1",
     "mocha": "^10.0.0",
     "pg": "^8.7.3",
     "pg-cursor": "^2.7.3",

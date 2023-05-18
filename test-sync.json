@@ -2,16 +2,16 @@
   "localSyncDirs": ["src", "test/node/src"],
   "kyselyTestDir": "test/node/src",
   "kyselyTestFiles": {
-    "delete": [],
-    "execute": [],
-    "insert": [],
-    "select": [
+    "delete.test.ts": [],
+    "execute.test.ts": [],
+    "insert.test.ts": [],
+    "select.test.ts": [
       "should release connection on premature async iterator stop",
       "should release connection on premature async iterator stop when using a specific chunk size",
       "should throw an error if the cursor implementation is not provided for the postgres dialect"
     ],
-    "transaction": ["should run multiple transactions in parallel"],
-    "update": []
+    "transaction.test.ts": ["should run multiple transactions in parallel"],
+    "update.test.ts": []
   },
   "downloadDir": "test/node/src/temp",
   "customSetupFile": "../custom-test-setup.js"
