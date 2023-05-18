@@ -1,6 +1,6 @@
 {
   "name": "kysely-pg-client",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "author": "Joseph T. Lapp <arachnojoe@gmail.com>",
   "license": "MIT",
   "description": "Non-pooling single-connection Postgres dialect for Kysely",
