@@ -64,7 +64,7 @@ The other test suite runs the dialect against the tests in the most recent relea
 
 **IMPORTANT**: If the `test:latest` script reports problems, it does not necessarily mean that there are bugs in the repo. It only means that a more recent version of Kysely is somehow incompatible with the current version of this repo. This repo calls out to Kysely's native tests, and changes to those tests might require changes to this repo to keep it properly integrated with them. This repo also borrows some code from Kysely, and `test:latest` reports when Kysely has changed the borrowed code in some way.
 
-However, if you do find that `test:latest` is reporting problems for a newer version of Kysely, and if you are planning to use that newer version of Kysely, please open an issue on this repo to report that it should be upgraded to work with the newer tests.
+However, if you do find that `test:latest` is reporting problems for a newer version of Kysely, please open an issue on this repo to report that it should be upgraded to work with the newer tests.
 
 ## License
 
