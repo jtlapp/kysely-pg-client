@@ -32,12 +32,12 @@
     }
   },
   "scripts": {
-    "clean": "rm -rf node_modules & rm -rf dist & rm -rf test/node/dist & rm -rf test/node/src/temp",
+    "clean": "rm -rf node_modules & rm -rf dist & rm -rf test/current/dist & rm -rf test/current/src/temp",
     "format": "prettier --write \"**/*.{js,ts,tsx,md}\"",
     "build": "rm -rdf dist && tsc && npx check-synced-code && tsc -p tsconfig-cjs.json",
     "test": "npm run build && npm run test:build && npm run test:node",
-    "test:build": "rm -rdf test/node/dist && npx load-kysely-tests && tsc -p test/node",
-    "test:node": "DIALECT=postgres mocha --timeout 15000 'test/node/dist/**/*.test.js'"
+    "test:build": "rm -rdf test/current/dist && npx load-kysely-tests && tsc -p test/current",
+    "test:node": "DIALECT=postgres mocha --timeout 15000 'test/current/dist/**/*.test.js'"
   },
   "dependencies": {
     "kysely": "^0.24.2"

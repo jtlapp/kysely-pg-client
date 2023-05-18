@@ -1,3 +1,5 @@
+// SYNC WITH https://github.com/kysely-org/kysely/blob/master/test/node/src/transaction.test.ts
+
 import { CompiledQuery, Transaction } from 'kysely'
 
 import {
