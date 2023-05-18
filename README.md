@@ -50,13 +50,16 @@ There are two test suites you can run. The first runs the dialect against the te
 
 [`test/current/src/downloads/_kysely-version.txt`](https://github.com/jtlapp/kysely-pg-client/blob/main/test/current/src/downloads/_kysely-version.txt)
 
+Before running the tests, you'll need to install the dependencies and run docker. Uses `pnpm` to build with the dependency versions I've confirmed to work with the package, but most likely any package manager will work:
+
+```
+pnpm install
+docker compose up
+```
+
 Run these test using the `test` script:
 
 ```
-npm run test
-
-yarn test
-
 pnpm test
 ```
 
