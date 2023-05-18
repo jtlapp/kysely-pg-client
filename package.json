@@ -32,12 +32,12 @@
     }
   },
   "scripts": {
-    "clean": "rm -rf node_modules & rm -rf dist & rm -rf test/current/dist & rm -rf test/current/src/temp",
+    "clean": "rm -rf node_modules & rm -rf dist & rm -rf test/current/dist & rm -rf test/latest/dist",
     "format": "prettier --write \"**/*.{js,ts,tsx,md}\"",
-    "build": "rm -rdf dist && tsc && npx check-synced-code && tsc -p tsconfig-cjs.json",
-    "test": "npm run build && npm run test:build && npm run test:node",
-    "test:build": "rm -rdf test/current/dist && npx load-kysely-tests && tsc -p test/current",
-    "test:node": "DIALECT=postgres mocha --timeout 15000 'test/current/dist/**/*.test.js'"
+    "build": "rm -rdf dist && tsc && tsc -p tsconfig-cjs.json",
+    "test": "npm run build && rm -rdf test/current/dist && tsc -p test/current && DIALECT=postgres mocha --timeout 15000 'test/current/dist/**/*.test.js'",
+    "build:latest": "rm -rdf dist && tsc && npx check-synced-code --config=test-sync.latest.json && tsc -p tsconfig-cjs.json",
+    "test:latest": "npm run build:latest && rm -rdf test/latest/dist && npx load-kysely-tests --config=test-sync.latest.json && tsc -p test/latest && DIALECT=postgres mocha --timeout 15000 'test/latest/dist/**/*.test.js'"
   },
   "dependencies": {
     "kysely": "^0.24.2"
@@ -54,7 +54,7 @@
     "chai": "^4.3.6",
     "chai-as-promised": "^7.1.1",
     "chai-subset": "^1.6.0",
-    "kysely-test-sync": "0.5.1",
+    "kysely-test-sync": "0.5.2",
     "mocha": "^10.0.0",
     "pg": "^8.7.3",
     "pg-cursor": "^2.7.3",

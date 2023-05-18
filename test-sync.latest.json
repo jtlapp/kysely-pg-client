@@ -1,5 +1,5 @@
 {
-  "localSyncDirs": ["src", "test/current/src"],
+  "localSyncDirs": ["src", "test/latest/src"],
   "kyselyTestDir": "test/node/src",
   "kyselyTestFiles": {
     "delete.test.ts": [],
@@ -13,6 +13,6 @@
     "transaction.test.ts": ["should run multiple transactions in parallel"],
     "update.test.ts": []
   },
-  "downloadDir": "test/current/src/downloads",
+  "downloadDir": "test/latest/src/downloads",
   "customSetupFile": "../custom-test-setup.js"
 }
