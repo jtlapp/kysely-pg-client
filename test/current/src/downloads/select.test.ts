@@ -1,5 +1,5 @@
 // Copied from Kysely | MIT License | Copyright (c) 2022 Sami Koskimäki
-// https://github.com/kysely-org/kysely/blob/master/0.24.2/test/node/src/select.test.ts
+// https://github.com/kysely-org/kysely/blob/0.24.2/test/node/src/select.test.ts
 
 import { reportMochaContext } from '../custom-test-setup.js';
 import { Kysely, PostgresDialect, sql } from 'kysely'
