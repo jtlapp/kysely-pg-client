@@ -1,5 +1,5 @@
 .DS_Store
-test/**/temp
+test/latest/src/downloads
 
 # Logs
 logs
