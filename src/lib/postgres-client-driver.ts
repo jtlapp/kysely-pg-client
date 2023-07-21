@@ -11,10 +11,10 @@ import {
   TransactionSettings,
 } from 'kysely'
 
-import { PostgresClientDialectConfig } from './postgres-client-dialect-config'
-import { PostgresSingleClient } from './postgres-single-client'
-import { isFunction, freeze } from './utils/object-utils'
-import { extendStackTrace } from './utils/stack-trace-utils'
+import { PostgresClientDialectConfig } from './postgres-client-dialect-config.js'
+import { PostgresSingleClient } from './postgres-single-client.js'
+import { isFunction, freeze } from './utils/object-utils.js'
+import { extendStackTrace } from './utils/stack-trace-utils.js'
 
 /**
  * Kysely driver that uses a `pg.Client`, providing a single connection to

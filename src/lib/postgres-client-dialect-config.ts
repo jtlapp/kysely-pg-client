@@ -4,7 +4,7 @@
 
 import { PostgresCursorConstructor } from 'kysely'
 
-import { PostgresSingleClient } from './postgres-single-client'
+import { PostgresSingleClient } from './postgres-single-client.js'
 
 /**
  * Configuration for PostgresClientDialect, which accepts an instance of

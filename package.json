@@ -1,6 +1,6 @@
 {
   "name": "kysely-pg-client",
-  "version": "0.1.6",
+  "version": "0.1.11",
   "author": "Joseph T. Lapp <arachnojoe@gmail.com>",
   "license": "MIT",
   "description": "Non-pooling single-connection Postgres dialect for Kysely, thoroughly tested",
@@ -26,15 +26,16 @@
   ],
   "exports": {
     ".": {
-      "types": "./dist/esm/index.d.ts",
+      "types": "./dist/cjs/index.d.ts",
       "import": "./dist/esm/index.js",
-      "default": "./dist/cjs/index.js"
+      "require": "./dist/cjs/index.js"
     }
   },
   "scripts": {
     "clean": "rm -rf node_modules & rm -rf dist & rm -rf test/current/dist & rm -rf test/latest/dist",
     "format": "prettier --write \"**/*.{js,ts,tsx,md}\"",
-    "build": "rm -rdf dist && tsc && tsc -p tsconfig-cjs.json",
+    "build": "rm -rdf dist && tsc && tsc -p tsconfig-cjs.json && pnpm write-packages",
+    "write-packages": "echo '{\"type\":\"module\"}' > dist/esm/package.json && echo '{\"type\":\"commonjs\"}' > dist/cjs/package.json",
     "test": "npm run build && rm -rdf test/current/dist && tsc -p test/current && DIALECT=postgres mocha --timeout 15000 'test/current/dist/**/*.test.js'",
     "build:latest": "rm -rdf dist && tsc && npx check-synced-code --config=test-sync.latest.json && tsc -p tsconfig-cjs.json",
     "test:latest": "npm run build:latest && rm -rdf test/latest/dist && npx load-kysely-tests --config=test-sync.latest.json && tsc -p test/latest && DIALECT=postgres mocha --timeout 15000 'test/latest/dist/**/*.test.js'"

@@ -14,8 +14,8 @@ import {
   QueryCompiler,
 } from 'kysely'
 
-import { PostgresClientDialectConfig } from './postgres-client-dialect-config'
-import { PostgresClientDriver } from './postgres-client-driver'
+import { PostgresClientDialectConfig } from './postgres-client-dialect-config.js'
+import { PostgresClientDriver } from './postgres-client-driver.js'
 
 /**
  * A Kysely Postgres dialect that uses a single `pg.Client` instance, providng
