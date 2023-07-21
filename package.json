@@ -1,6 +1,6 @@
 {
   "name": "kysely-pg-client",
-  "version": "0.1.11",
+  "version": "0.1.12",
   "author": "Joseph T. Lapp <arachnojoe@gmail.com>",
   "license": "MIT",
   "description": "Non-pooling single-connection Postgres dialect for Kysely, thoroughly tested",
@@ -18,8 +18,8 @@
     "dialect",
     "serverless"
   ],
-  "main": "dist/esm/index.js",
-  "types": "dist/esm/index.d.ts",
+  "main": "dist/cjs/index.js",
+  "types": "dist/cjs/index.d.ts",
   "source": "/index.ts",
   "files": [
     "dist/**"
