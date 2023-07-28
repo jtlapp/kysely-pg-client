@@ -2,6 +2,14 @@
 
 Non-pooling single-connection Postgres dialect for Kysely, thoroughly tested
 
+## NOTICE
+
+This package allows Kysely to be used with a [node-postgres](https://github.com/brianc/node-postgres) (pg) [Client](https://node-postgres.com/apis/client) class rather than a [Pool](https://node-postgres.com/apis/pool) class for the purpose of reducing unnecessary overhead in serverless environments. However, the Pool class has a potential performance advantage even serverless: it allows for the lazy construction of the connection. If a serverless function has multiple independent modules that each may or may not create a connection, having them use a common Pool allows them to only create the connection if needed and to share that connection when created.
+
+Also, given that Pool is the more flexible configuration, libraries tend to allow for configuration via Pool but not via Client, limiting the compatibility of a Client solution with other libraries. [Lucia](https://lucia-auth.com/) for authentication is one example.
+
+**For these reasons, it is advisable to use Pool and not to use the present library.**
+
 ## Introduction
 
 `PostgresClientDialect` is a [Kysely](https://github.com/kysely-org/kysely) dialect for Postgres that uses a single connection instead of a pool of connections. As with the Postgres dialect that Kysely provides, it is based on [node-postgres](https://github.com/brianc/node-postgres) (pg), but it is configured with a [Client](https://node-postgres.com/apis/client) rather than a [Pool](https://node-postgres.com/apis/pool).
