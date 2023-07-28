@@ -4,7 +4,7 @@ Non-pooling single-connection Postgres dialect for Kysely, thoroughly tested
 
 ## NOTICE
 
-This package allows Kysely to be used with a [node-postgres](https://github.com/brianc/node-postgres) (pg) [Client](https://node-postgres.com/apis/client) class rather than a [Pool](https://node-postgres.com/apis/pool) class for the purpose of reducing unnecessary overhead in serverless environments. However, the Pool class has a potential performance advantage even serverless: it allows for the lazy construction of the connection. If a serverless function has multiple independent modules that each may or may not create a connection, having them use a common Pool allows them to only create the connection if needed and to share that connection when created.
+This package allows Kysely to be used with a [node-postgres](https://github.com/brianc/node-postgres) (pg) [Client](https://node-postgres.com/apis/client) class rather than a [Pool](https://node-postgres.com/apis/pool) class for the purpose of reducing unnecessary overhead in serverless environments. However, the Pool class has a potential performance advantage even serverless: it allows for the lazy construction of the connection. If a serverless function has multiple independent modules that each may or may not create a connection, having them use a common Pool allows them to only create the connection if needed and yet share the same connection.
 
 Also, given that Pool is the more flexible configuration, libraries tend to allow for configuration via Pool but not via Client, limiting the compatibility of a Client solution with other libraries. [Lucia](https://lucia-auth.com/) for authentication is one example.
 
